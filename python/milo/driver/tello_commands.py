@@ -13,10 +13,7 @@ class Tello_Commands:
         self._fin = False
         self._abort = False
         self._response = None 
-        # self._control_sdk = False
 
-        # self._timer_control = None
-        
         self.tello_address = (ip, port)
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._socket.bind(('0.0.0.0', port))
@@ -39,9 +36,6 @@ class Tello_Commands:
                 #print(self.response)
             except socket.error as exc:
                 print ("Caught exception socket.error : %s" % exc)
-
-    # def __set_control_sdk(self):
-    #     self._control_sdk = False
 
     def __set_abort(self):
         self._abort = True
@@ -74,51 +68,29 @@ class Tello_Commands:
 
     # ----------------------------------------------------------------------------------------------------
 
-    # def get_control_sdk(self):
-    #     return self._control_sdk
-
     def act_sdk(self):
-        # self._timer_control = threading.Timer(15.0, self.__set_control_sdk)
-
-        # print ('sent: command')
         self._socket.sendto(b'command', self.tello_address)
         result = self.__get_response()
         if result == 'ok':
-            # self._control_sdk = True
-            # self._timer_control.start()
             return True
         else:
-            # self._control_sdk = False
             return False
     
     def act_cam(self, enable):
-        # self._timer_control = threading.Timer(15.0, self.__set_control_sdk)
-
         if enable:
-            # print ('sent: streamon')
             self._socket.sendto(b'streamon', self.tello_address)
         else:
-            # print ('sent: streamoff')
             self._socket.sendto(b'streamoff', self.tello_address)
         result = self.__get_response()
         if result == 'ok':
-            # self._control_sdk = True
-            # self._timer_control.start()
             return True
         else:
-            # self._control_sdk = False
             return False
 
     def send_cmd(self, cmd):
-        # self._timer_control = threading.Timer(15.0, self.__set_control_sdk)
-
-        # print (">> send cmd: {}".format(cmd))
         self._socket.sendto(cmd.encode('utf-8'), self.tello_address)
         result = self.__get_response()
         if result == 'ok':
-            # self._control_sdk = True
-            # self._timer_control.start()
             return True
         else:
-            # self._control_sdk = False
             return False

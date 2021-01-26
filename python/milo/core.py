@@ -44,9 +44,6 @@ class Milo:
 
     # ----------------------------------------------------------------------------------------------------
 
-    # def is_active_control(self):
-    #     return self._commands.get_control_sdk()
-
     def enable_control(self):
         return self._commands.act_sdk()
 
@@ -135,7 +132,6 @@ def main():
     while True:
         try: 
             print(piojo.telemetry.get_battery())
-            # print(piojo.is_active_control())
             frame = piojo.camera.get_frame()
             if frame is None or frame.size == 0:
                 continue 
