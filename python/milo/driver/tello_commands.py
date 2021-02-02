@@ -32,7 +32,7 @@ class Tello_Commands:
     def __receive_thread(self):
         while not self._fin:
             try:
-                self._response, _ = self._socket.recvfrom(3000)
+                self._response, _ = self._socket.recvfrom(1024)
                 #print(self.response)
             except socket.error as exc:
                 print ("Caught exception socket.error : %s" % exc)
@@ -89,8 +89,11 @@ class Tello_Commands:
 
     def send_cmd(self, cmd):
         self._socket.sendto(cmd.encode('utf-8'), self.tello_address)
-        result = self.__get_response()
-        if result == 'ok':
+        if 'rc' in cmd:
             return True
         else:
-            return False
+            result = self.__get_response()
+            if result == 'ok':
+                return True
+            else:
+                return False

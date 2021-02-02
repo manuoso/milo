@@ -19,7 +19,6 @@ mechanisms of boost::python.
 // for ssize_t (signed int type as large as pointer type)
 #include <cstdlib>
 #include <stdexcept>
-#include <utility>
 
 struct AVCodecContext;
 struct AVFrame;
@@ -70,7 +69,7 @@ the data and return the frame. parse returns the number
 of consumed bytes of the input stream. It stops consuming 
 bytes at frame boundaries.
   */
-  ssize_t parse(const unsigned char* in_data, ssize_t in_size);
+  ptrdiff_t parse(const unsigned char* in_data, ptrdiff_t in_size);
   bool is_frame_available() const;
   const AVFrame& decode_frame();
 };

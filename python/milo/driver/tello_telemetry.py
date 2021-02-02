@@ -11,14 +11,14 @@ class Tello_Telemetry:
         self._fin = False
         self._response = None 
 
-        self._angles = [0.0, 0.0, 0.0]
-        self._velocity = [0.0, 0.0, 0.0]
-        self._temp = [0.0, 0.0]
-        self._tof = 0.0
-        self._height = 0.0
-        self._battery = 0.0
+        self._angles = [0, 0, 0]
+        self._velocity = [0, 0, 0]
+        self._temp = [0, 0]
+        self._tof = 0
+        self._height = 0
+        self._battery = 0
         self._baro = 0.0
-        self._flytime = 0.0
+        self._flytime = 0
         self._acceleration = [0.0, 0.0, 0.0]
 
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -36,7 +36,7 @@ class Tello_Telemetry:
     def __receive_thread(self):
         while not self._fin:
             try:
-                self._response, _ = self._socket.recvfrom(3000)
+                self._response, _ = self._socket.recvfrom(1024)
                 self.__decode_response(self._response.decode('utf-8'))
                 # print(self.response)
                 # Example response raw: b'pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:72;temph:74;tof:10;h:0;bat:93;baro:-42.45;time:0;agx:0.00;agy:-2.00;agz:-999.00;\r\n'
