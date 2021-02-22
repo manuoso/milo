@@ -43,7 +43,6 @@ endif()
 # set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/" ${CMAKE_MODULE_PATH})
 
 list(APPEND MILO_DEFINITIONS "")
-set(MILO_COMPILE_OPTIONS "-Wall -g -O0")
 
 #########################################
 
@@ -68,12 +67,8 @@ add_library(${PROJECT_NAME} SHARED ${MILO_SOURCE_FILES} ${MILO_HEADER_FILES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include) 
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${MILO_DEFINITIONS})
-string(REPLACE " " ";" MILO_COMPILE_OPTIONS_REPLACED_FLAGS ${MILO_COMPILE_OPTIONS})
 
-target_compile_options(${PROJECT_NAME} PUBLIC ${MILO_COMPILE_OPTIONS_REPLACED_FLAGS})
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
-
-set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE C)
 
 #########################################
 

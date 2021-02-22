@@ -50,6 +50,12 @@ namespace milo{
 
             void setCamera(bool _enable);
 
+            void rc_control(int _roll, int _pitch, int _throttle, int _yaw);
+
+            void move(std::string _dir, int _dist);
+
+            void rotate(std::string _dir, int _angle);
+
             void send(std::string _cmd);
 
         private:

@@ -98,6 +98,27 @@ namespace milo{
     }
 
     //---------------------------------------------------------------------------------------------------------------------
+    void TelloCommand::rc_control(int _roll, int _pitch, int _throttle, int _yaw){
+        std::lock_guard<std::mutex> lock(mtx_);
+        std::string msg = "rc " + std::to_string(_roll) + " " + std::to_string(_pitch) + " " + std::to_string(_throttle) + " " + std::to_string(_yaw);
+        commandSocket_->send(msg);
+    }
+
+    //---------------------------------------------------------------------------------------------------------------------
+    void TelloCommand::move(std::string _dir, int _dist){
+        std::lock_guard<std::mutex> lock(mtx_);
+        std::string msg = _dir + " " + std::to_string(_dist);
+        commandSocket_->send(msg);
+    }
+
+    //---------------------------------------------------------------------------------------------------------------------
+    void TelloCommand::rotate(std::string _dir, int _angle){
+        std::lock_guard<std::mutex> lock(mtx_);
+        std::string msg = _dir + " " + std::to_string(_angle);
+        commandSocket_->send(msg);
+    }
+
+    //---------------------------------------------------------------------------------------------------------------------
     void TelloCommand::send(std::string _cmd){
         std::lock_guard<std::mutex> lock(mtx_);
         commandSocket_->send(_cmd);
