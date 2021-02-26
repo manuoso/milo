@@ -50,8 +50,6 @@ set(Boost_USE_MULTITHREAD ON)
 
 find_package(Boost REQUIRED COMPONENTS system thread regex)
 
-find_package(Boost REQUIRED COMPONENTS system thread regex)
-
 find_package(OpenCV)
 
 #########################################
