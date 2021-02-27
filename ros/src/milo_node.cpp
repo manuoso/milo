@@ -68,6 +68,9 @@ bool MiloNode::init() {
     imuPub_                 = nh.advertise<sensor_msgs::Imu>("/tello/imu", 1);
     batPub_                 = nh.advertise<sensor_msgs::BatteryState>("/tello/battery", 1);
     angHeightPub_           = nh.advertise<geometry_msgs::PoseStamped>("/tello/angle_height", 1);
+    
+    // Topics for Camera
+    imagePub_               = nh.advertise<sensor_msgs::Image> ("/tello/camera", 1);
 
     // ****************************************************************************************************
 
@@ -126,6 +129,7 @@ bool MiloNode::run() {
 //---------------------------------------------------------------------------------------------------------------------
 bool MiloNode::finalize() {
     fin_ = true;
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     if(telemThread_.joinable()){
         telemThread_.join();
     }   
@@ -197,7 +201,7 @@ bool MiloNode::telemetryThread() {
 
         sensor_msgs::BatteryState msgBattery;
         msgBattery.header.stamp = msgAngHeight.header.stamp;
-        msgBattery.voltage = telem.bat;
+        msgBattery.percentage = telem.bat;
         msgBattery.current = telem.time;
 
         sensor_msgs::Imu msgImu;
@@ -235,7 +239,7 @@ bool MiloNode::cameraThread(){
 
         std_msgs::Header header;
         header.stamp = ros::Time::now();
-        const sensor_msgs::ImagePtr msgImage = cv_bridge::CvImage(header, "rgb8", img).toImageMsg();
+        const sensor_msgs::ImagePtr msgImage = cv_bridge::CvImage(header, "bgr8", img).toImageMsg();
         imagePub_.publish(msgImage);
 
         rate.sleep();
