@@ -28,8 +28,14 @@ bool MiloNode::init() {
     drone_ = milo::MILO::create(true, true);
 
     drone_->command()->setControl();
+    int contTimeout = 0;
     while(drone_->command()->isWaiting()){
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        if(contTimeout == 1000){
+            std::cout << "[MILO_NODE] TIMEOUT in waiting command" << std::endl;
+            return false;
+        }
+        contTimeout++;
     }
 
     if(drone_->command()->isRespond()){
@@ -40,8 +46,14 @@ bool MiloNode::init() {
     }
 
     drone_->command()->setCamera(true);
+    contTimeout = 0;
     while(drone_->command()->isWaiting()){
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        if(contTimeout == 1000){
+            std::cout << "[MILO_NODE] TIMEOUT in waiting command" << std::endl;
+            return false;
+        }
+        contTimeout++;
     }
 
     if(drone_->command()->isRespond()){
@@ -89,7 +101,7 @@ bool MiloNode::run() {
 
     std_msgs::String msgStatus;
 
-    while(fin_ == false && ros::ok()){
+    while (fin_ == false && ros::ok()) { 
         switch(state_){
             case eState::WAIT:
             {   
@@ -123,6 +135,7 @@ bool MiloNode::run() {
         statusPub_.publish(msgStatus);
         rate.sleep();
     }
+    
     return true;
 }
 

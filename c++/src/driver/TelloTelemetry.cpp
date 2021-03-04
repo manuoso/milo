@@ -27,16 +27,20 @@ namespace milo{
     {
         stateSocket_ = new StateSocket(_port);
         if(stateSocket_ != nullptr){
-            std::cout << "Init State Socket" << std::endl;
+            std::cout << "[TELLO_TELEMETRY] Init State Socket" << std::endl;
             decodeThread();
         }else{
-            std::cout << "Not initialize State Socket" << std::endl;
+            std::cout << "[TELLO_TELEMETRY] Not initialize State Socket" << std::endl;
         }
     }
 
     //---------------------------------------------------------------------------------------------------------------------
     TelloTelemetry::~TelloTelemetry(){
         run_ = false;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        if(thread_.joinable()){
+            thread_.join();
+        }   
         delete stateSocket_;
     }
     

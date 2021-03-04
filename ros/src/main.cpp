@@ -26,10 +26,10 @@ MiloNode *miloNode;
 //---------------------------------------------------------------------------------------------------------------------
 // Replacement handler
 void finishHandler(int _sig){
-    std::cout << "Finish Handler: Catch signal " << _sig << std::endl;
+    std::cout << "[MILO_NODE] Finish Handler: Catch signal " << _sig << std::endl;
     bool finish = miloNode->finalize();
     if(!finish){
-        std::cout << "App not finished cleanly, please check it." << std::endl;
+        std::cout << "[MILO_NODE] App not finished cleanly, please check it." << std::endl;
     }
 }
 
@@ -42,10 +42,10 @@ void shutdownCallback(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue& result){
 
     if (num_params > 1){
         std::string reason = params[1];
-        ROS_WARN("Shutdown request received. Reason: [%s]", reason.c_str());
+        ROS_WARN("[MILO_NODE] Shutdown request received. Reason: [%s]", reason.c_str());
         bool finish = miloNode->finalize();
         if(!finish){
-            std::cout << "App not finished cleanly, please check it." << std::endl;
+            std::cout << "[MILO_NODE] App not finished cleanly, please check it." << std::endl;
         }
     }
 

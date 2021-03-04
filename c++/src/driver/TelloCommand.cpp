@@ -27,9 +27,9 @@ namespace milo{
     {
         commandSocket_ = new CommandSocket(_ip, _port);
         if(commandSocket_ != nullptr){
-            std::cout << "Init Command Socket" << std::endl;
+            std::cout << "[TELLO_COMMAND] Init Command Socket" << std::endl;
         }else{
-            std::cout << "Not initialize Command Socket" << std::endl;
+            std::cout << "[TELLO_COMMAND] Not initialize Command Socket" << std::endl;
         }
     }
 

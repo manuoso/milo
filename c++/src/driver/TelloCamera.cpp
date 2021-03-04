@@ -27,9 +27,9 @@ namespace milo{
     {
         cameraSocket_ = new CameraSocket(_port);
         if(cameraSocket_ != nullptr){
-            std::cout << "Init Camera Socket" << std::endl;
+            std::cout << "[TELLO_CAMERA] Init Camera Socket" << std::endl;
         }else{
-            std::cout << "Not initialize Camera Socket" << std::endl;
+            std::cout << "[TELLO_CAMERA] Not initialize Camera Socket" << std::endl;
         }
     }
 
