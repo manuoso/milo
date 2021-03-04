@@ -170,19 +170,22 @@ bool MiloNode::landService(std_srvs::SetBool::Request &_req, std_srvs::SetBool::
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             if(contTimeout == 1000){
                 std::cout << "[MILO_NODE] TIMEOUT in waiting command land" << std::endl;
-                return false;
+                _res.success = false;
             }
             contTimeout++;
         }
 
         if(drone_->command()->isRespond()){
             std::cout << "[MILO_NODE] land: TRUE" << std::endl;
+            _res.success = true;
+
         }else{
             std::cout << "[MILO_NODE] land: FALSE" << std::endl;
-            return false;
+            _res.success = false;
         }
+    }else{
+        _res.success = false;
     }
-    _res.success = true;
     
     state_ = eState::WAIT;
 
@@ -200,19 +203,21 @@ bool MiloNode::takeoffService(std_srvs::SetBool::Request &_req, std_srvs::SetBoo
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             if(contTimeout == 1000){
                 std::cout << "[MILO_NODE] TIMEOUT in waiting command takeoff" << std::endl;
-                return false;
+                _res.success = false;
             }
             contTimeout++;
         }
 
         if(drone_->command()->isRespond()){
             std::cout << "[MILO_NODE] takeoff: TRUE" << std::endl;
+            _res.success = true;
         }else{
             std::cout << "[MILO_NODE] takeoff: FALSE" << std::endl;
-            return false;
+            _res.success = false;
         }
+    }else{
+        _res.success = false;
     }
-    _res.success = true;
     
     state_ = eState::WAIT;
 
@@ -230,19 +235,21 @@ bool MiloNode::emergencyService(std_srvs::SetBool::Request &_req, std_srvs::SetB
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             if(contTimeout == 1000){
                 std::cout << "[MILO_NODE] TIMEOUT in waiting command emergency" << std::endl;
-                return false;
+                _res.success = false;
             }
             contTimeout++;
         }
 
         if(drone_->command()->isRespond()){
             std::cout << "[MILO_NODE] emergency: TRUE" << std::endl;
+            _res.success = true;
         }else{
             std::cout << "[MILO_NODE] emergency: FALSE" << std::endl;
-            return false;
+            _res.success = false;
         }
+    }else{
+        _res.success = false;
     }
-    _res.success = true;
     
     state_ = eState::WAIT;
 
