@@ -32,7 +32,7 @@ bool MiloNode::init() {
     while(drone_->command()->isWaiting()){
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         if(contTimeout == 1000){
-            std::cout << "[MILO_NODE] TIMEOUT in waiting command" << std::endl;
+            std::cout << "[MILO_NODE] TIMEOUT in waiting command set control" << std::endl;
             return false;
         }
         contTimeout++;
@@ -50,7 +50,7 @@ bool MiloNode::init() {
     while(drone_->command()->isWaiting()){
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         if(contTimeout == 1000){
-            std::cout << "[MILO_NODE] TIMEOUT in waiting command" << std::endl;
+            std::cout << "[MILO_NODE] TIMEOUT in waiting command set camera" << std::endl;
             return false;
         }
         contTimeout++;
@@ -165,6 +165,22 @@ bool MiloNode::landService(std_srvs::SetBool::Request &_req, std_srvs::SetBool::
 
     if(_req.data){
         drone_->command()->land();
+        int contTimeout = 0;
+        while(drone_->command()->isWaiting()){
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            if(contTimeout == 1000){
+                std::cout << "[MILO_NODE] TIMEOUT in waiting command land" << std::endl;
+                return false;
+            }
+            contTimeout++;
+        }
+
+        if(drone_->command()->isRespond()){
+            std::cout << "[MILO_NODE] land: TRUE" << std::endl;
+        }else{
+            std::cout << "[MILO_NODE] land: FALSE" << std::endl;
+            return false;
+        }
     }
     _res.success = true;
     
@@ -179,6 +195,22 @@ bool MiloNode::takeoffService(std_srvs::SetBool::Request &_req, std_srvs::SetBoo
 
     if(_req.data){
         drone_->command()->takeoff();
+        int contTimeout = 0;
+        while(drone_->command()->isWaiting()){
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            if(contTimeout == 1000){
+                std::cout << "[MILO_NODE] TIMEOUT in waiting command takeoff" << std::endl;
+                return false;
+            }
+            contTimeout++;
+        }
+
+        if(drone_->command()->isRespond()){
+            std::cout << "[MILO_NODE] takeoff: TRUE" << std::endl;
+        }else{
+            std::cout << "[MILO_NODE] takeoff: FALSE" << std::endl;
+            return false;
+        }
     }
     _res.success = true;
     
@@ -193,6 +225,22 @@ bool MiloNode::emergencyService(std_srvs::SetBool::Request &_req, std_srvs::SetB
 
     if(_req.data){
         drone_->command()->emergency();
+        int contTimeout = 0;
+        while(drone_->command()->isWaiting()){
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            if(contTimeout == 1000){
+                std::cout << "[MILO_NODE] TIMEOUT in waiting command emergency" << std::endl;
+                return false;
+            }
+            contTimeout++;
+        }
+
+        if(drone_->command()->isRespond()){
+            std::cout << "[MILO_NODE] emergency: TRUE" << std::endl;
+        }else{
+            std::cout << "[MILO_NODE] emergency: FALSE" << std::endl;
+            return false;
+        }
     }
     _res.success = true;
     
