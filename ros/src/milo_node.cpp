@@ -72,6 +72,7 @@ bool MiloNode::init() {
     // Services
     landSrv_                = nh.advertiseService("/tello/land", &MiloNode::landService, this);
     takeoffSrv_             = nh.advertiseService("/tello/takeoff", &MiloNode::takeoffService, this);
+    emergencySrv_           = nh.advertiseService("/tello/emergency", &MiloNode::emergencyService, this);
 
     // Topic for moving 
     rcSub_                  = nh.subscribe("/tello/rc", 1, &MiloNode::rcCallback, this);
@@ -118,6 +119,11 @@ bool MiloNode::run() {
                 msgStatus.data = "TAKE_OFF";
                 break;
             }
+            case eState::EMERGENCY:
+            {   
+                msgStatus.data = "EMERGENCY";
+                break;
+            }
             case eState::RC:
             {   
                 msgStatus.data = "RC";
@@ -158,7 +164,7 @@ bool MiloNode::landService(std_srvs::SetBool::Request &_req, std_srvs::SetBool::
     state_ = eState::LAND;
 
     if(_req.data){
-        drone_->command()->send("land");
+        drone_->command()->land();
     }
     _res.success = true;
     
@@ -172,7 +178,21 @@ bool MiloNode::takeoffService(std_srvs::SetBool::Request &_req, std_srvs::SetBoo
     state_ = eState::TAKEOFF;
 
     if(_req.data){
-        drone_->command()->send("takeoff");
+        drone_->command()->takeoff();
+    }
+    _res.success = true;
+    
+    state_ = eState::WAIT;
+
+    return true;
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+bool MiloNode::emergencyService(std_srvs::SetBool::Request &_req, std_srvs::SetBool::Response &_res){
+    state_ = eState::EMERGENCY;
+
+    if(_req.data){
+        drone_->command()->emergency();
     }
     _res.success = true;
     

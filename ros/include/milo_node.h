@@ -55,6 +55,7 @@ class MiloNode
             WAIT,
             LAND,
             TAKEOFF,
+            EMERGENCY,
             RC,
             EXIT
         };
@@ -73,6 +74,8 @@ class MiloNode
 
         bool takeoffService(std_srvs::SetBool::Request &_req, std_srvs::SetBool::Response &_res);
 
+        bool emergencyService(std_srvs::SetBool::Request &_req, std_srvs::SetBool::Response &_res);
+
         void rcCallback(const std_msgs::Int32MultiArray::ConstPtr& _msg);
 
     private:
@@ -89,7 +92,7 @@ class MiloNode
 
         ros::Publisher statusPub_, imuPub_, batPub_, angHeightPub_, imagePub_;
         ros::Subscriber rcSub_;
-        ros::ServiceServer landSrv_, takeoffSrv_;
+        ros::ServiceServer landSrv_, takeoffSrv_, emergencySrv_;
 
         bool fin_ = false;
 

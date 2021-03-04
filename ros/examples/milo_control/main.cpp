@@ -43,6 +43,7 @@ int main(int _argc, char **_argv) {
     ros::NodeHandle nh;
     ros::ServiceClient takeoffReq = nh.serviceClient<std_srvs::SetBool>("/tello/takeoff");
     ros::ServiceClient landReq = nh.serviceClient<std_srvs::SetBool>("/tello/land");
+    ros::ServiceClient emergencyReq = nh.serviceClient<std_srvs::SetBool>("/tello/emergency");
 
     ros::Publisher rcPub = nh.advertise<std_msgs::Int32MultiArray>("/tello/rc", 1);
 
@@ -50,7 +51,12 @@ int main(int _argc, char **_argv) {
     bool finish = false;
 	while(!finish){
         int mode = 0;
-        std::cout << "Press (1) for takeoff, (0) for land, (2) for send RC cmd, (9) for exit: " <<std::endl;
+        std::cout << "Press: " << std::endl;
+        std::cout << "(1) for takeoff" << std::endl;
+        std::cout << "(0) for land" << std::endl;
+        std::cout << "(2) for send RC" << std::endl;
+        std::cout << "(8) for emergency" << std::endl;
+        std::cout << "(9) for exit" << std::endl;
         std::cin >> mode;
 
         switch(mode){
@@ -134,6 +140,22 @@ int main(int _argc, char **_argv) {
                     }
                 }else{
                     std::cout << "Failed to call service of LAND" << std::endl;
+                }
+                break;
+            }
+            case 8:
+            {   
+                std_srvs::SetBool srv;
+                srv.request.data = true;
+
+                if(emergencyReq.call(srv)){
+                    if(srv.response.success){
+                        std::cout << "Service of EMERGENCY success" << std::endl;
+                    }else{
+                        std::cout << "Service of EMERGENCY failed" << std::endl;
+                    }
+                }else{
+                    std::cout << "Failed to call service of EMERGENCY" << std::endl;
                 }
                 break;
             }
