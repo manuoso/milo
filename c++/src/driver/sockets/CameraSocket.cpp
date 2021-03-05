@@ -39,7 +39,7 @@ namespace milo{
             seq_buffer_ = std::vector<unsigned char>(65536);
             listen();
         }else{
-            std::cout << "Socket not initialized" << std::endl;
+            std::cout << "[CAMERA_SOCKET] Socket not initialized" << std::endl;
         }
     }
 

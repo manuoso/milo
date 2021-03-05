@@ -104,7 +104,7 @@ namespace milo{
             while(run_){
                 float diff = command_->timeFromLastRecv();
                 // std::cout << "diff time: " << diff << std::endl;
-                if(diff > 10.0){
+                if(diff > 5.0){
                     // std::cout << "Sending rc 0 0 0 0" << std::endl;
                     command_->send("rc 0 0 0 0");
                 }else if(diff > 15){

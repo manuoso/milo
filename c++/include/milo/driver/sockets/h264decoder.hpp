@@ -51,16 +51,16 @@ class H264DecodeFailure : public H264Exception
 class H264Decoder
 {
     /* Persistent things here, using RAII for cleanup. */
-    AVCodecContext        *context;
-    AVFrame               *frame;
-    AVCodec               *codec;
-    AVCodecParserContext  *parser;
+    AVCodecContext        *context_;
+    AVFrame               *frame_;
+    AVCodec               *codec_;
+    AVCodecParserContext  *parser_;
     /* In the documentation example on the github master branch, the 
     packet is put on the heap. This is done here to store the pointers 
     to the encoded data, which must be kept around  between calls to 
     parse- and decode frame. In release 11 it is put on the stack, too. 
     */
-    AVPacket              *pkt;
+    AVPacket              *pkt_;
 
     public:
         H264Decoder();
@@ -83,8 +83,8 @@ class H264Decoder
 // TODO: Rename to OutputStage or so?!
 class ConverterRGB24
 {
-    SwsContext *context;
-    AVFrame *framergb;
+    SwsContext *context_;
+    AVFrame *framergb_;
   
     public:
         ConverterRGB24();

@@ -32,7 +32,7 @@ namespace milo{
             buffer_ = std::vector<unsigned char>(1024);
             listen();
         }else{
-            std::cout << "Socket not initialized" << std::endl;
+            std::cout << "[COMMAND_SOCKET] Socket not initialized" << std::endl;
         }
     }
 
@@ -58,7 +58,7 @@ namespace milo{
         receiving_ = false;
 
         if (waiting_) {
-            std::cout << "Error TIMEOUT" << std::endl;
+            std::cout << "[COMMAND_SOCKET] Error TIMEOUT" << std::endl;
             waiting_ = false;
         }
     }

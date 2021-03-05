@@ -29,7 +29,7 @@ namespace milo{
             buffer_ = std::vector<unsigned char>(1024);
             listen();
         }else{
-            std::cout << "Socket not initialized" << std::endl;
+            std::cout << "[STATE_SOCKET] Socket not initialized" << std::endl;
         }
     }
 
