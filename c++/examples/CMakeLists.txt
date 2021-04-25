@@ -27,3 +27,4 @@ macro(build_example example_name example_files)
 endmacro()
 
 build_example(test_tello test_tello/main.cpp)
+build_example(test_joystick test_joystick/main.cpp)
