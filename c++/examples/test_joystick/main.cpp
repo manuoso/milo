@@ -22,8 +22,10 @@
 
 #include <signal.h>
 
+#include "milo/milo.h"
 #include "milo/modules/joystick/JoystickBackend.h"
 
+using namespace milo;
 using namespace milo::modules::joystick;
 
 bool fin = false;
@@ -39,9 +41,11 @@ void finishHandler(int _sig)
 
 int main(int _argc, char **_argv)
 {
-	
 	signal(SIGINT, finishHandler);
     signal(SIGTERM, finishHandler);
+
+	MILO *drone = nullptr;
+	drone->createOnlyLogger();
 
     jsbd = new JoystickBackend();
     

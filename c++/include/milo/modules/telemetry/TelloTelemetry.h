@@ -92,7 +92,7 @@ namespace telemetry{
 
             std::thread thread_;                  
             std::mutex mtx_;    
-            bool run_ = false;
+            bool run_;
 
     };
 

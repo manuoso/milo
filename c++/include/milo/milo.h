@@ -46,6 +46,8 @@ namespace milo{
             /// Close the system.
             static void close();
 
+            void createOnlyLogger();
+
             //---------------------------------------------------------------------------------------------------------------------
             // MODULES
 	        //---------------------------------------------------------------------------------------------------------------------
@@ -80,7 +82,7 @@ namespace milo{
             TelloTelemetry *telemetry_ = nullptr;
             TelloCamera *camera_ = nullptr;
 
-            bool run_ = false;
+            bool run_;
             std::thread thread_;                  
 
     };

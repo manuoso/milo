@@ -30,7 +30,8 @@ namespace driver{
     using namespace milo::modules::logger;
 
     //---------------------------------------------------------------------------------------------------------------------
-    CommandSocket::CommandSocket(std::string _ip, int _port)
+    CommandSocket::CommandSocket(std::string _ip, int _port) 
+        : waiting_(false), respond_(false)
     {
         remotEndpoint_ = boost::asio::ip::udp::endpoint(boost::asio::ip::address::from_string(_ip), _port);
         if (create(38065))

@@ -39,7 +39,8 @@ namespace driver{
     //    generating a frame. Presumably the keyframe is stored in the parser and referenced later.
 
     //---------------------------------------------------------------------------------------------------------------------
-    CameraSocket::CameraSocket(int _port)
+    CameraSocket::CameraSocket(int _port) 
+        : seq_buffer_next_(0), seq_buffer_num_packets_(0)
     {
         if (create(_port))
         {

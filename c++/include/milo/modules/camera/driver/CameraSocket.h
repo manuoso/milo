@@ -56,8 +56,8 @@ namespace driver{
 
         private:
             std::vector<unsigned char> seq_buffer_; 
-            size_t seq_buffer_next_ = 0;
-            int seq_buffer_num_packets_ = 0;          
+            size_t seq_buffer_next_;
+            int seq_buffer_num_packets_;          
 
             H264Decoder decoder_;
             ConverterRGB24 converter_;

@@ -199,7 +199,11 @@ namespace joystick{
 						{
 							val = 0;
 						}
-						_value = val * scale_;
+				
+						if (val == 0)
+							_value = val * abs(scale_);
+						else
+							_value = val * scale_;
 
 						result = true;
 					}

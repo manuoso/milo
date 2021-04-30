@@ -62,8 +62,8 @@ namespace driver{
             boost::asio::ip::udp::endpoint remotEndpoint_;
 
             std::chrono::high_resolution_clock::time_point sendTime_;  
-            bool waiting_ = false;    
-            bool respond_ = false;
+            bool waiting_;    
+            bool respond_;
 
     };
 

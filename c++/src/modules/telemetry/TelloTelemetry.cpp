@@ -30,6 +30,7 @@ namespace telemetry{
 
     //---------------------------------------------------------------------------------------------------------------------
     TelloTelemetry::TelloTelemetry(int _port)
+        : run_(false)
     {
         stateSocket_ = new driver::StateSocket(_port);
         if (stateSocket_ != nullptr)
