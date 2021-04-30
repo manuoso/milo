@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -19,74 +19,52 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //---------------------------------------------------------------------------------------------------------------------
 
-#include "milo/driver/sockets/TelloSocket.h"
+
+#include "milo/modules/camera/TelloCamera.h"
 
 namespace milo{
-    //---------------------------------------------------------------------------------------------------------------------
-    bool TelloSocket::close(){
-        run_ = false;
-        ioService_.stop();
+namespace modules{
+namespace camera{
 
-        boost::system::error_code ec;
-        if(socket_){
-            socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-            socket_->close();
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        if(thread_.joinable()){
-            thread_.join();
-        }   
-
-        if(ec.value() == 0){
-            return true;            
-        }else{
-            return false;
-        }
-    }
+    using namespace milo::modules::logger;
 
     //---------------------------------------------------------------------------------------------------------------------
-    bool TelloSocket::create(int _port){
-        try{
-            socket_ = new boost::asio::ip::udp::socket(ioService_, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), _port));
-        }catch(std::exception &e){
-            std::cerr << e.what() << std::endl;
-            socket_ = nullptr;
-        }
-
-        if(socket_ != nullptr){
-            return true;            
-        }else{
-            return false;
-        }
-    }
-
-    //---------------------------------------------------------------------------------------------------------------------
-    void TelloSocket::listen()
+    TelloCamera::TelloCamera(int _port)
     {
-        run_ = true;
-        thread_ = std::thread(
-        [&]()
-        {
-            while(run_){
-                size_t r = socket_->receive(boost::asio::buffer(buffer_));
-                process_packet(r);
-            }
-        });
+        cameraSocket_ = new driver::CameraSocket(_port);
+        if (cameraSocket_ != nullptr)
+            LogManager::get()->status("[TELLO_CAMERA] Init Camera Socket", true);
+        else
+            LogManager::get()->error("[TELLO_CAMERA] Not initialize Camera Socket", true);
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    bool TelloSocket::receiving()
+    TelloCamera::~TelloCamera()
+    {
+        delete cameraSocket_;
+    }
+    
+    //---------------------------------------------------------------------------------------------------------------------
+    bool TelloCamera::isReceiving()
     {
         std::lock_guard<std::mutex> lock(mtx_);
-        return receiving_;
+        return cameraSocket_->receiving();
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    void TelloSocket::timeout()
+    void TelloCamera::timeout()
     {
         std::lock_guard<std::mutex> lock(mtx_);
-        receiving_ = false;
+        return cameraSocket_->timeout();
     }
 
+    //---------------------------------------------------------------------------------------------------------------------
+    cv::Mat TelloCamera::getImage()
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        return cameraSocket_->getFrame();
+    }
+
+}
+}
 }

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -23,11 +23,17 @@
 #ifndef MILO_H_
 #define MILO_H_
 
-#include "milo/driver/TelloCommand.h"
-#include "milo/driver/TelloTelemetry.h"
-#include "milo/driver/TelloCamera.h"
+#include "milo/modules/logger/LogManager.h"
+
+#include "milo/modules/command/TelloCommand.h"
+#include "milo/modules/telemetry/TelloTelemetry.h"
+#include "milo/modules/camera/TelloCamera.h"
 
 namespace milo{
+    using namespace modules::command;
+    using namespace modules::telemetry;
+    using namespace modules::camera;
+
     class MILO {
         public:
             //---------------------------------------------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -19,44 +19,56 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //---------------------------------------------------------------------------------------------------------------------
 
+
 // Those class are based in: https://github.com/clydemcqueen/tello_ros/blob/master/tello_driver/
 
-#ifndef MILO_SOCKETS_COMMAND_H_
-#define MILO_SOCKETS_COMMAND_H_
+#ifndef __MILO_MODULES_CAMERA_DRIVER_H__
+#define __MILO_MODULES_CAMERA_DRIVER_H__ 1
 
-#include "milo/driver/sockets/TelloSocket.h"
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui.hpp>
+
+#include <libavutil/frame.h>
+
+#include "milo/modules/logger/LogManager.h"
+
+#include "milo/modules/socket/TelloSocket.h"
+#include "milo/modules/camera/decoder/h264decoder.hpp"
 
 namespace milo{
-    class CommandSocket : public TelloSocket{
+namespace modules{
+namespace camera{
+namespace driver{
+    
+    class CameraSocket : public socket::TelloSocket
+    {
         public:
-            CommandSocket(std::string _ip, int _port);
+            CameraSocket(int _port);
 
-            virtual ~CommandSocket();
+            virtual ~CameraSocket();
 
-            bool isInit();
-            
-            void timeout() override;
-
-            bool waiting();
-
-            bool respond();
-
-            std::chrono::high_resolution_clock::time_point receive_time();
-
-            std::chrono::high_resolution_clock::time_point send_time();
-
-            void send(std::string _cmd);
+            cv::Mat getFrame();
 
         private:
             void process_packet(size_t r) override;
 
-        private:
-            boost::asio::ip::udp::endpoint remotEndpoint_;
+            void decode_frames();
 
-            std::chrono::high_resolution_clock::time_point sendTime_;  
-            bool waiting_ = false;    
-            bool respond_ = false;
+        private:
+            std::vector<unsigned char> seq_buffer_; 
+            size_t seq_buffer_next_ = 0;
+            int seq_buffer_num_packets_ = 0;          
+
+            H264Decoder decoder_;
+            ConverterRGB24 converter_;
+
+            cv::Mat frameDecoded_;
 
     };
+
 }
+}
+}
+}
+
 #endif

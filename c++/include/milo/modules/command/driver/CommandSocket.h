@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -19,31 +19,57 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //---------------------------------------------------------------------------------------------------------------------
 
+
 // Those class are based in: https://github.com/clydemcqueen/tello_ros/blob/master/tello_driver/
 
-#ifndef MILO_SOCKETS_STATE_H_
-#define MILO_SOCKETS_STATE_H_
+#ifndef __MILO_MODULES_COMMAND_DRIVER_H__
+#define __MILO_MODULES_COMMAND_DRIVER_H__ 1
 
-#include "milo/driver/sockets/TelloSocket.h"
-#include <regex>
+#include "milo/modules/logger/LogManager.h"
+
+#include "milo/modules/socket/TelloSocket.h"
 
 namespace milo{
-    class StateSocket : public TelloSocket
+namespace modules{
+namespace command{
+namespace driver{
+
+    class CommandSocket : public socket::TelloSocket
     {
         public:
-            StateSocket(int _port);
+            CommandSocket(std::string _ip, int _port);
 
-            virtual ~StateSocket();
+            virtual ~CommandSocket();
 
-            std::map<std::string, std::string> getDecodedData();
+            bool isInit();
+            
+            void timeout() override;
+
+            bool waiting();
+
+            bool respond();
+
+            std::chrono::high_resolution_clock::time_point receive_time();
+
+            std::chrono::high_resolution_clock::time_point send_time();
+
+            void send(std::string _cmd);
 
         private:
             void process_packet(size_t r) override;
 
         private:
-            std::map<std::string, std::string> decodedData_;
+            boost::asio::ip::udp::endpoint remotEndpoint_;
+
+            std::chrono::high_resolution_clock::time_point sendTime_;  
+            bool waiting_ = false;    
+            bool respond_ = false;
 
     };
+
+}
+}
+}
 }
 
 #endif

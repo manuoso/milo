@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -23,6 +23,9 @@
 #include "milo/milo.h"
 
 namespace milo{
+
+    using namespace milo::modules::logger;
+    
     MILO *MILO::milo_ = nullptr;
 
     //---------------------------------------------------------------------------------------------------------------------
@@ -34,17 +37,19 @@ namespace milo{
     //---------------------------------------------------------------------------------------------------------------------
 
 	//---------------------------------------------------------------------------------------------------------------------
-	MILO * MILO::create(bool _initState, bool _initCamera) {
-		if(!milo_){
+	MILO * MILO::create(bool _initState, bool _initCamera) 
+    {
+		if (!milo_)
 			milo_ = new MILO(_initState, _initCamera);
-        }else{
-            std::cout << "\033[31mSomeone tried to reinitialize the MILO system \033[m" << std::endl;
-        }
+        else
+            LogManager::get()->error("[MILO] Someone tried to reinitialize the MILO system", true);
+
         return milo_;
 	}
 
 	//---------------------------------------------------------------------------------------------------------------------
-	void MILO::close(){
+	void MILO::close()
+    {
 		delete milo_;
 	}
 
@@ -53,10 +58,10 @@ namespace milo{
     //---------------------------------------------------------------------------------------------------------------------
     
     //---------------------------------------------------------------------------------------------------------------------
-    bool MILO::isInit(){
-        if(command_ == nullptr){
+    bool MILO::isInit()
+    {
+        if (command_ == nullptr)
             return false;
-        }
         
         return true;
     }
@@ -66,55 +71,62 @@ namespace milo{
     //---------------------------------------------------------------------------------------------------------------------
 
     //---------------------------------------------------------------------------------------------------------------------
-    MILO::MILO(bool _initState, bool _initCamera) {
+    MILO::MILO(bool _initState, bool _initCamera) 
+    {
+        LogManager::init("log");
         command_ = new TelloCommand("192.168.10.1", 8889);
 
-        if(command_->isInit()){
+        if (command_->isInit())
             timeoutThread();
-        }else{
+        else
             command_ = nullptr;
-        }
 
-        if(_initState && command_ != nullptr){
+        if (_initState && command_ != nullptr)
             telemetry_ = new TelloTelemetry(8890);
-        }
-        if(_initCamera && command_ != nullptr){
+        
+        if (_initCamera && command_ != nullptr)
             camera_ = new TelloCamera(11111);
-        }
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    MILO::~MILO() {
+    MILO::~MILO() 
+    {
         run_ = false;
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        if(thread_.joinable()){
+        
+        if (thread_.joinable())
             thread_.join();
-        }   
+        
         delete command_;
         delete telemetry_;
         delete camera_;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    void MILO::timeoutThread(){
+    void MILO::timeoutThread()
+    {
         run_ = true;
         thread_ = std::thread(
         [&]()
         {
-            while(run_){
+            while (run_)
+            {
                 float diff = command_->timeFromLastRecv();
-                // std::cout << "diff time: " << diff << std::endl;
-                if(diff > 5.0){
-                    // std::cout << "Sending rc 0 0 0 0" << std::endl;
+
+                if (diff > 5.0)
+                {
+                    LogManager::get()->status("[MILO] Sending rc 0 0 0 0", false);
                     command_->send("rc 0 0 0 0");
-                }else if(diff > 15){
+                }
+                else if(diff > 15)
+                {
                     command_->timeout();
-                    if(telemetry_ != nullptr){
+
+                    if(telemetry_ != nullptr)
                         telemetry_->timeout();
-                    }
-                    if(camera_ != nullptr){
+                    
+                    if(camera_ != nullptr)
                         camera_->timeout();
-                    }
                 }
                 std::this_thread::sleep_for(std::chrono::seconds(1));
             }

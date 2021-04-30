@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -19,89 +19,110 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //---------------------------------------------------------------------------------------------------------------------
 
-#include "milo/driver/TelloTelemetry.h"
+
+#include "milo/modules/telemetry/TelloTelemetry.h"
 
 namespace milo{
+namespace modules{
+namespace telemetry{
+
+    using namespace milo::modules::logger;
+
     //---------------------------------------------------------------------------------------------------------------------
     TelloTelemetry::TelloTelemetry(int _port)
     {
-        stateSocket_ = new StateSocket(_port);
-        if(stateSocket_ != nullptr){
-            std::cout << "[TELLO_TELEMETRY] Init State Socket" << std::endl;
+        stateSocket_ = new driver::StateSocket(_port);
+        if (stateSocket_ != nullptr)
+        {
+            LogManager::get()->status("[TELLO_TELEMETRY] Init State Socket", true);
             decodeThread();
-        }else{
-            std::cout << "[TELLO_TELEMETRY] Not initialize State Socket" << std::endl;
+        }
+        else
+        {
+            LogManager::get()->error("[TELLO_TELEMETRY] Not initialize State Socket", true);
         }
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    TelloTelemetry::~TelloTelemetry(){
+    TelloTelemetry::~TelloTelemetry()
+    {
         run_ = false;
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        if(thread_.joinable()){
+
+        if (thread_.joinable())
             thread_.join();
-        }   
+        
         delete stateSocket_;
     }
     
     //---------------------------------------------------------------------------------------------------------------------
-    bool TelloTelemetry::isReceiving(){
+    bool TelloTelemetry::isReceiving()
+    {
         std::lock_guard<std::mutex> lock(mtx_);
         return stateSocket_->receiving();
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    void TelloTelemetry::timeout(){
+    void TelloTelemetry::timeout()
+    {
         std::lock_guard<std::mutex> lock(mtx_);
         return stateSocket_->timeout();
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    TelloTelemetry::TelemetryData TelloTelemetry::getAllTelemetry(){
+    TelloTelemetry::TelemetryData TelloTelemetry::getAllTelemetry()
+    {
         std::lock_guard<std::mutex> lock(mtx_);
         return data_;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    std::vector<int> TelloTelemetry::getRPY(){
+    std::vector<int> TelloTelemetry::getRPY()
+    {
         std::lock_guard<std::mutex> lock(mtx_);
         std::vector<int> rpy = {data_.pitch, data_.roll, data_.yaw};
         return rpy;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    std::vector<int> TelloTelemetry::getVelocity(){
+    std::vector<int> TelloTelemetry::getVelocity()
+    {
         std::lock_guard<std::mutex> lock(mtx_);
         std::vector<int> vel = {data_.vx, data_.vy, data_.vz};
         return vel;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    int TelloTelemetry::getTOF(){
+    int TelloTelemetry::getTOF()
+    {
         std::lock_guard<std::mutex> lock(mtx_);
         return data_.tof;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    int TelloTelemetry::getHeight(){
+    int TelloTelemetry::getHeight()
+    {
         std::lock_guard<std::mutex> lock(mtx_);
         return data_.h;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    int TelloTelemetry::getBattery(){
+    int TelloTelemetry::getBattery()
+    {
         std::lock_guard<std::mutex> lock(mtx_);
         return data_.bat;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    int TelloTelemetry::getTimeOfFlight(){
+    int TelloTelemetry::getTimeOfFlight()
+    {
         std::lock_guard<std::mutex> lock(mtx_);
         return data_.time;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    std::vector<float> TelloTelemetry::getAcceleration(){
+    std::vector<float> TelloTelemetry::getAcceleration()
+    {
         std::lock_guard<std::mutex> lock(mtx_);
         std::vector<float> acc = {data_.ax, data_.ay, data_.az};
         return acc;
@@ -114,7 +135,8 @@ namespace milo{
         thread_ = std::thread(
         [&]()
         {
-            while(run_){
+            while (run_)
+            {
                 std::map<std::string, std::string> data = stateSocket_->getDecodedData();
                 decodeData(data);
                 // std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -127,7 +149,8 @@ namespace milo{
     {
         std::lock_guard<std::mutex> lock(mtx_);
         
-        if(_data.find("pitch") != _data.end()){
+        if (_data.find("pitch") != _data.end())
+        {
             data_.pitch = std::stoi(_data["pitch"]);
             data_.roll = std::stoi(_data["roll"]);
             data_.yaw = std::stoi(_data["yaw"]);
@@ -147,4 +170,6 @@ namespace milo{
         }
     }
 
+}
+}
 }

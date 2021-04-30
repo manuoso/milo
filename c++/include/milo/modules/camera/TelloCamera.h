@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -19,57 +19,40 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //---------------------------------------------------------------------------------------------------------------------
 
-#ifndef MILO_TELLO_COMMAND_H_
-#define MILO_TELLO_COMMAND_H_
 
-#include "milo/driver/sockets/CommandSocket.h"
+#ifndef __MILO_MODULES_CAMERA_TELLO_CAMERA_H__
+#define __MILO_MODULES_CAMERA_TELLO_CAMERA_H__ 1
+
+#include "milo/modules/logger/LogManager.h"
+
+#include "milo/modules/camera/driver/CameraSocket.h"
 
 namespace milo{
-    class TelloCommand
+namespace modules{
+namespace camera{
+    
+    class TelloCamera
     {
         public:
-            TelloCommand(std::string _ip, int _port);
+            TelloCamera(int _port);
 
-            ~TelloCommand();
-
-            bool isInit();
+            ~TelloCamera();
 
             bool isReceiving();
 
-            bool isWaiting();
-
-            bool isRespond();
-
             void timeout();
 
-            float timeSendRecv();
-
-            float timeFromLastRecv();
-
-            void setControl();
-
-            void setCamera(bool _enable);
-
-            void takeoff();
-
-            void land();
-            
-            void emergency();
-
-            void rc_control(int _roll, int _pitch, int _throttle, int _yaw);
-
-            void move(std::string _dir, int _dist);
-
-            void rotate(std::string _dir, int _angle);
-
-            void send(std::string _cmd);
+            cv::Mat getImage();
 
         private:
-            CommandSocket *commandSocket_ = nullptr;
+            driver::CameraSocket *cameraSocket_ = nullptr;
 
             std::mutex mtx_;    
 
     };
+
+}
+}
 }
 
 #endif

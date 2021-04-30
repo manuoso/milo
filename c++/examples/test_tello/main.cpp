@@ -19,16 +19,19 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //---------------------------------------------------------------------------------------------------------------------
 
+
 #include <iostream>
 #include <thread>
 #include <chrono>
 
 #include "milo/milo.h"
 
+using namespace milo;
+
 int main(int _argc, char **_argv){
 
-    milo::MILO *drone = nullptr;
-    drone = milo::MILO::create(true, true);
+    MILO *drone = nullptr;
+    drone = MILO::create(true, true);
 
     drone->command()->setControl();
     while(drone->command()->isWaiting()){

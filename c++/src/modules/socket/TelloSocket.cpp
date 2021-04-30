@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -19,55 +19,84 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //---------------------------------------------------------------------------------------------------------------------
 
-#include "milo/driver/sockets/StateSocket.h"
+
+#include "milo/modules/socket/TelloSocket.h"
 
 namespace milo{
+namespace modules{
+namespace socket{
+
     //---------------------------------------------------------------------------------------------------------------------
-    StateSocket::StateSocket(int _port)
+    bool TelloSocket::close()
     {
-        if(create(_port)){
-            buffer_ = std::vector<unsigned char>(1024);
-            listen();
-        }else{
-            std::cout << "[STATE_SOCKET] Socket not initialized" << std::endl;
+        run_ = false;
+        ioService_.stop();
+
+        boost::system::error_code ec;
+        if (socket_)
+        {
+            socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+            socket_->close();
         }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        if (thread_.joinable())
+            thread_.join();
+
+        if (ec.value() == 0)
+            return true;            
+        else
+            return false;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    StateSocket::~StateSocket(){
-        close();
-        delete socket_;
+    bool TelloSocket::create(int _port)
+    {
+        try
+        {
+            socket_ = new boost::asio::ip::udp::socket(ioService_, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), _port));
+        }
+        catch (std::exception &e)
+        {
+            std::cerr << e.what() << std::endl;
+            socket_ = nullptr;
+        }
+
+        if (socket_ != nullptr)
+            return true;            
+        else
+            return false;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    std::map<std::string, std::string> StateSocket::getDecodedData(){
-        std::lock_guard<std::mutex> lock(mtx_);
-        return decodedData_;
+    void TelloSocket::listen()
+    {
+        run_ = true;
+        thread_ = std::thread(
+        [&]()
+        {
+            while (run_)
+            {
+                size_t r = socket_->receive(boost::asio::buffer(buffer_));
+                process_packet(r);
+            }
+        });
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    // Process a state packet from the drone, runs at 10Hz
-    void StateSocket::process_packet(size_t r)
+    bool TelloSocket::receiving()
     {
         std::lock_guard<std::mutex> lock(mtx_);
-
-        receiveTime_ = std::chrono::high_resolution_clock::now();
-
-        if (!receiving_) {
-            receiving_ = true;
-        }
-
-        // Split on ";" and ":" and generate a key:value map
-        std::map<std::string, std::string> fields;
-        std::string raw(buffer_.begin(), buffer_.begin() + r);
-        std::regex re("([^:]+):([^;]+);");
-        for (auto i = std::sregex_iterator(raw.begin(), raw.end(), re); i != std::sregex_iterator(); ++i) {
-            auto match = *i;
-            fields[match[1]] = match[2];
-        }
-
-        decodedData_ = fields;
-
+        return receiving_;
     }
 
+    //---------------------------------------------------------------------------------------------------------------------
+    void TelloSocket::timeout()
+    {
+        std::lock_guard<std::mutex> lock(mtx_);
+        receiving_ = false;
+    }
+
+}
+}
 }

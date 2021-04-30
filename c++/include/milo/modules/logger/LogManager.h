@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -19,31 +19,53 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //---------------------------------------------------------------------------------------------------------------------
 
-#ifndef MILO_TELLO_CAMERA_H_
-#define MILO_TELLO_CAMERA_H_
 
-#include "milo/driver/sockets/CameraSocket.h"
+#ifndef __MILO_MODULES_LOG_MANAGER_H__
+#define __MILO_MODULES_LOG_MANAGER_H__ 1
+
+#include <fstream>
+#include <iostream>
+
+#include <string>
+
+#include <mutex>
+#include <chrono>
 
 namespace milo{
-    class TelloCamera
-    {
-        public:
-            TelloCamera(int _port);
+namespace modules{
+namespace logger{
 
-            ~TelloCamera();
+	class LogManager {
+	public:
+		static void init(const std::string _appName);
 
-            bool isReceiving();
+		static void close();
 
-            void timeout();
+		static LogManager* get();
 
-            cv::Mat getImage();
+	public:
+		void message(const std::string &_msg, const std::string &_tag, bool _useCout = false);
+		
+		void status(const std::string &_msg, bool _useCout = false);
 
-        private:
-            CameraSocket *cameraSocket_ = nullptr;
+		void warning(const std::string &_msg, bool _useCout = false);
 
-            std::mutex mtx_;    
+		void error(const std::string &_msg, bool _useCout = false);
 
-    };
+	private:
+		LogManager(const std::string _appName);
+		~LogManager();
+
+		static LogManager *singleton_;
+
+		std::chrono::high_resolution_clock::time_point initTime_;
+		std::ofstream logFile_;
+		std::mutex lock_;
+
+	};
+
+}
+}
 }
 
 #endif

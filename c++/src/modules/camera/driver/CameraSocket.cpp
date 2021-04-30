@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -19,9 +19,16 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //---------------------------------------------------------------------------------------------------------------------
 
-#include "milo/driver/sockets/CameraSocket.h"
+
+#include "milo/modules/camera/driver/CameraSocket.h"
 
 namespace milo{
+namespace modules{
+namespace camera{
+namespace driver{
+
+    using namespace milo::modules::logger;
+
     // Notes on Tello video:
     // -- frames are always 960x720.
     // -- frames are split into UDP packets of length 1460.
@@ -34,23 +41,28 @@ namespace milo{
     //---------------------------------------------------------------------------------------------------------------------
     CameraSocket::CameraSocket(int _port)
     {
-        if(create(_port)){
+        if (create(_port))
+        {
             buffer_ = std::vector<unsigned char>(2048);
             seq_buffer_ = std::vector<unsigned char>(65536);
             listen();
-        }else{
-            std::cout << "[CAMERA_SOCKET] Socket not initialized" << std::endl;
+        }
+        else
+        {
+            LogManager::get()->error("[CAMERA_SOCKET] Socket not initialized", true);
         }
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    CameraSocket::~CameraSocket(){
+    CameraSocket::~CameraSocket()
+    {
         close();
         delete socket_;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    cv::Mat CameraSocket::getFrame(){
+    cv::Mat CameraSocket::getFrame()
+    {
         std::lock_guard<std::mutex> lock(mtx_);
         return frameDecoded_;
     }
@@ -65,13 +77,15 @@ namespace milo{
 
         receiveTime_ = std::chrono::high_resolution_clock::now();
 
-        if (!receiving_) {
+        if (!receiving_) 
+        {
             receiving_ = true;
             seq_buffer_next_ = 0;
             seq_buffer_num_packets_ = 0;
         }
 
-        if (seq_buffer_next_ + r >= seq_buffer_.size()) {
+        if (seq_buffer_next_ + r >= seq_buffer_.size()) 
+        {
             // std::cout << "Video buffer overflow, dropping sequence" + "\n";
             seq_buffer_next_ = 0;
             seq_buffer_num_packets_ = 0;
@@ -83,7 +97,8 @@ namespace milo{
         seq_buffer_num_packets_++;
 
         // If the packet is < 1460 bytes then it's the last packet in the sequence
-        if(r < 1460){
+        if (r < 1460)
+        {
             decode_frames();
 
             seq_buffer_next_ = 0;
@@ -96,11 +111,14 @@ namespace milo{
     {
         size_t next = 0;
 
-        try {
-            while (next < seq_buffer_next_) {
+        try 
+        {
+            while (next < seq_buffer_next_) 
+            {
                 ssize_t consumed = decoder_.parse(seq_buffer_.data() + next, seq_buffer_next_ - next);
 
-                if (decoder_.is_frame_available()) {
+                if (decoder_.is_frame_available()) 
+                {
                     const AVFrame &frame = decoder_.decode_frame();
 
                     // Convert pixels from YUV420P to BGR24
@@ -118,9 +136,14 @@ namespace milo{
                 }
                 next += consumed;
             }
-        }catch (std::runtime_error &e) {
+        }
+        catch (std::runtime_error &e) 
+        {
             std::cerr << e.what() << std::endl;
         }
     }
 
+}
+}
+}
 }

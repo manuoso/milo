@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -20,8 +20,8 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#ifndef MILO_JOY_JOYSTICK_H_
-#define MILO_JOY_JOYSTICK_H_
+#ifndef __MILO_MODULES_JOYSTICK_BACKEND_H__
+#define __MILO_MODULES_JOYSTICK_BACKEND_H__ 1
 
 #include <linux/input.h>
 #include <linux/joystick.h>
@@ -47,7 +47,12 @@
 #include <sstream>
 #include <fstream>
 
+#include "milo/modules/logger/LogManager.h"
+
 namespace milo{
+namespace modules{
+namespace joystick{
+
     class JoystickBackend
     {
         public:
@@ -57,11 +62,14 @@ namespace milo{
             ~JoystickBackend();
 
             bool isInit();
+            bool closeJoy();
             
             int getAxisCount();
             int getButtonsCount();
 
+            void setDeadzone(double _deadzone);
             bool setFeedback(struct ff_effect _effect);
+            bool setCorrection(std::vector<int> _type, std::vector<int> _prec, std::vector<int> _coef);
 
             bool readJoy(std::string &_eventType, int &_eventNumber, double &_value);
         
@@ -71,8 +79,6 @@ namespace milo{
             std::string identifyFF(const std::string &_name);
 
             bool openJoy(const std::string &_joy, const std::string &_ff);
-
-            bool closeJoy();
 
         private:
             bool init_;
@@ -90,6 +96,9 @@ namespace milo{
             double unscaledDeadzone_;
 
     };
+
+}
+}
 }
 
 #endif

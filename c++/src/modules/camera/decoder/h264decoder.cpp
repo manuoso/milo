@@ -17,8 +17,9 @@ extern "C" {
 #define CODEC_FLAG_TRUNCATED AV_CODEC_FLAG_TRUNCATED
 #endif
 
-#include "milo/driver/sockets/h264decoder.hpp"
 #include <utility>
+
+#include "milo/modules/camera/decoder/h264decoder.hpp"
 
 typedef unsigned char ubyte;
 

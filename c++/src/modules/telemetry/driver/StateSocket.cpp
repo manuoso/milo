@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -19,41 +19,68 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //---------------------------------------------------------------------------------------------------------------------
 
-#include "milo/driver/TelloCamera.h"
+
+#include "milo/modules/telemetry/driver/StateSocket.h"
 
 namespace milo{
+namespace modules{
+namespace telemetry{
+namespace driver{
+
+    using namespace milo::modules::logger;
+
     //---------------------------------------------------------------------------------------------------------------------
-    TelloCamera::TelloCamera(int _port)
+    StateSocket::StateSocket(int _port)
     {
-        cameraSocket_ = new CameraSocket(_port);
-        if(cameraSocket_ != nullptr){
-            std::cout << "[TELLO_CAMERA] Init Camera Socket" << std::endl;
-        }else{
-            std::cout << "[TELLO_CAMERA] Not initialize Camera Socket" << std::endl;
+        if (create(_port))
+        {
+            buffer_ = std::vector<unsigned char>(1024);
+            listen();
+        }
+        else
+        {
+            LogManager::get()->status("[STATE_SOCKET] Socket not initialized", false);
         }
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    TelloCamera::~TelloCamera(){
-        delete cameraSocket_;
-    }
-    
-    //---------------------------------------------------------------------------------------------------------------------
-    bool TelloCamera::isReceiving(){
-        std::lock_guard<std::mutex> lock(mtx_);
-        return cameraSocket_->receiving();
+    StateSocket::~StateSocket(){
+        close();
+        delete socket_;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    void TelloCamera::timeout(){
+    std::map<std::string, std::string> StateSocket::getDecodedData(){
         std::lock_guard<std::mutex> lock(mtx_);
-        return cameraSocket_->timeout();
+        return decodedData_;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    cv::Mat TelloCamera::getImage(){
+    // Process a state packet from the drone, runs at 10Hz
+    void StateSocket::process_packet(size_t r)
+    {
         std::lock_guard<std::mutex> lock(mtx_);
-        return cameraSocket_->getFrame();
+
+        receiveTime_ = std::chrono::high_resolution_clock::now();
+
+        if (!receiving_) 
+            receiving_ = true;
+
+        // Split on ";" and ":" and generate a key:value map
+        std::map<std::string, std::string> fields;
+        std::string raw(buffer_.begin(), buffer_.begin() + r);
+        std::regex re("([^:]+):([^;]+);");
+        for (auto i = std::sregex_iterator(raw.begin(), raw.end(), re); i != std::sregex_iterator(); ++i) 
+        {
+            auto match = *i;
+            fields[match[1]] = match[2];
+        }
+
+        decodedData_ = fields;
+
     }
 
+}
+}
+}
 }

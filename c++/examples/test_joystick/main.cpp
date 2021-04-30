@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -19,12 +19,15 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //---------------------------------------------------------------------------------------------------------------------
 
-#include "milo/driver/joy/JoystickBackend.h"
 
 #include <signal.h>
 
+#include "milo/modules/joystick/JoystickBackend.h"
+
+using namespace milo::modules::joystick;
+
 bool fin = false;
-milo::JoystickBackend *jsbd;
+JoystickBackend *jsbd;
 
 // Replacement handler
 void finishHandler(int _sig)
@@ -40,7 +43,7 @@ int main(int _argc, char **_argv)
 	signal(SIGINT, finishHandler);
     signal(SIGTERM, finishHandler);
 
-    jsbd = new milo::JoystickBackend();
+    jsbd = new JoystickBackend();
     
 	std::string event_type = "";
 	int event_number = 0;

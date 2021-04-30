@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -19,10 +19,15 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //---------------------------------------------------------------------------------------------------------------------
 
-#include "milo/driver/joy/JoystickBackend.h"
 
-namespace milo
-{
+#include "milo/modules/joystick/JoystickBackend.h"
+
+namespace milo{
+namespace modules{
+namespace joystick{
+
+    using namespace milo::modules::logger;
+
     //---------------------------------------------------------------------------------------------------------------------
 	JoystickBackend::JoystickBackend() :
 		init_(false), fd_(-1), ff_(-1)
@@ -52,11 +57,20 @@ namespace milo
 		return init_;
 	}
 
+	//---------------------------------------------------------------------------------------------------------------------
+	bool JoystickBackend::closeJoy()
+	{
+		if ((close(ff_) || close(fd_)) < 0)
+			return true;
+		else
+			return false;
+	}
+
     //---------------------------------------------------------------------------------------------------------------------
 	int JoystickBackend::getAxisCount()
 	{
 		uint8_t axisNumber = 0;
-		if(ioctl(fd_, JSIOCGAXES, &axisNumber) >= 0)
+		if (ioctl(fd_, JSIOCGAXES, &axisNumber) >= 0)
 			axisCount_ = axisNumber;
 		else
 			axisCount_ = 0;
@@ -67,7 +81,7 @@ namespace milo
 	int JoystickBackend::getButtonsCount()
 	{
 		uint8_t buttonsNumber = 0;
-		if(ioctl(fd_, JSIOCGBUTTONS, &buttonsNumber) >= 0)
+		if (ioctl(fd_, JSIOCGBUTTONS, &buttonsNumber) >= 0)
 			buttonCount_ = buttonsNumber;
 		else
 			buttonCount_ = 0;
@@ -75,11 +89,17 @@ namespace milo
 	}
 
     //---------------------------------------------------------------------------------------------------------------------
-	bool JoystickBackend::setFeedback(struct ff_effect _effect){
+	void JoystickBackend::setDeadzone(double _deadzone)
+	{
+		deadzone_ = _deadzone;
+		return ;
+	}
+
+    //---------------------------------------------------------------------------------------------------------------------
+	bool JoystickBackend::setFeedback(struct ff_effect _effect)
+	{
 		if (ff_ == -1)
-		{
-		return false;
-		}
+			return false;
 
 		joyEffect_.direction = 0;  // down
 		joyEffect_.type = FF_RUMBLE;
@@ -95,12 +115,43 @@ namespace milo
 	}
 
     //---------------------------------------------------------------------------------------------------------------------
+	bool JoystickBackend::setCorrection(std::vector<int> _type, std::vector<int> _prec, std::vector<int> _coef)
+	{
+		const int nAxis = getAxisCount();
+		struct js_corr corr[nAxis];
+		int cont = 0;
+
+		if (_type.size() > nAxis)
+			return false;
+
+		if ((_coef.size()%4 != 0) || (nAxis*4 != _coef.size()))
+			return false;
+
+		for (int i = 0; i < nAxis; i++)
+		{
+			corr[i].type = _type[i];
+			corr[i].prec = _prec[i];
+
+			for(int j = 0; j < 4; j++) 
+			{
+				corr[i].coef[j] = _coef[j+cont];
+			}
+			cont += 4;
+		}
+
+		if (ioctl(fd_, JSIOCSCORR, &corr) < 0) 
+			return false;
+
+		return true;
+	}
+
+    //---------------------------------------------------------------------------------------------------------------------
 	bool JoystickBackend::readJoy(std::string &_eventType, int &_eventNumber, double &_value)
 	{
 		FD_ZERO(&set_);
 		FD_SET(fd_, &set_);
 
-		if(updateEffect_)
+		if (updateEffect_)
 		{
 			int ret = ioctl(ff_, EVIOCSFF, &joyEffect_);
 			updateEffect_ = false;
@@ -110,9 +161,7 @@ namespace milo
 		if (FD_ISSET(fd_, &set_))
 		{
 			if (read(fd_, &event_, sizeof(js_event)) == -1 && errno != EAGAIN)
-			{
 				return false;  // joystick is probably closed
-			}
 
 			switch (event_.type)
 			{
@@ -157,7 +206,7 @@ namespace milo
 				}
 					break;
 				default:
-					std::cout << "Unknown event type. Time: " << event_.time << " Value: " << event_.value << " Type: " << event_.type << " Number: " << event_.number << std::endl;
+		            LogManager::get()->warning("[JOYSTICK] Unknown event type. Time: " + std::to_string(event_.time) + " Value: " + std::to_string(event_.value) + " Type: " + std::to_string(event_.type) + " Number: " + std::to_string(event_.number), true);
 					break;
 			}
 		}
@@ -168,14 +217,14 @@ namespace milo
     //---------------------------------------------------------------------------------------------------------------------
 	std::string JoystickBackend::identifyJoy()
 	{
-		const char path[] = "/dev/input";  // no trailing / here
+		const char path[] = "/dev/input"; 
 		struct dirent *entry;
 		struct stat stat_buf;
 
 		auto dev_dir = opendir(path);
 		if (dev_dir == nullptr)
 		{
-			std::cout << "Couldn't open " << path << " Error " << errno << ": " << strerror(errno) << std::endl;
+            LogManager::get()->error("[JOYSTICK] Couldn't open /dev/input", true);
 			return "";
 		}
 
@@ -183,38 +232,30 @@ namespace milo
 		{
 			// filter entries
 			if (strncmp(entry->d_name, "js", 2) != 0)  // skip device if it's not a joystick
-			{
 				continue;
-			}
 
 			std::string current_path = std::string(path) + "/" + entry->d_name;
 			if (stat(current_path.c_str(), &stat_buf) == -1)
-			{
 				continue;
-			}
 
 			if (!S_ISCHR(stat_buf.st_mode))  // input devices are character devices, skip other
-			{
 				continue;
-			}
 
 			// get joystick name
 			int joy_fd = open(current_path.c_str(), O_RDONLY);
+
 			if (joy_fd == -1)
-			{
 				continue;
-			}
 
 			char current_joy_name[128];
 			if (ioctl(joy_fd, JSIOCGNAME(sizeof(current_joy_name)), current_joy_name) < 0)
-			{
 				strncpy(current_joy_name, "Unknown", sizeof(current_joy_name));
-			}
 
 			close(joy_fd);
 			closedir(dev_dir);
 
-			std::cout << "Found Joystick: " << current_joy_name << " in: " << current_path.c_str() << std::endl;
+			std::string name = current_joy_name; // TODO: DELETE THIS VARIABLE
+            LogManager::get()->status("[JOYSTICK] Found Joystick: " + name + " in: " + current_path.c_str(), true);
 
 			return current_path;
 		}
@@ -225,21 +266,20 @@ namespace milo
     //---------------------------------------------------------------------------------------------------------------------
 	std::string JoystickBackend::identifyFF(const std::string &_name)
 	{
-		const char path[] = "/dev/input/by-id";  // no trailing / here
+		const char path[] = "/dev/input/by-id";
 		struct dirent *entry;
 
 		// the selected joy can be a symlink, but we want the canonical /dev/input/jsX
 		char realpath_buf[PATH_MAX];
 		char *res = realpath(_name.c_str(), realpath_buf);
 		if (res == nullptr)
-		{
 			return "";
-		}
 
 		auto dev_dir = opendir(path);
 		if (dev_dir == nullptr)
 		{
-			std::cout << "Couldn't open " << path << " Error " << errno << ": " << strerror(errno) << std::endl;
+			std::string error = strerror(errno);
+            LogManager::get()->error("[JOYSTICK] Couldn't open /dev/input/by-id Error: " + error, true);
 			return "";
 		}
 
@@ -247,23 +287,18 @@ namespace milo
 		std::string joy_dev_id;
 
 		// first, find the device in /dev/input/by-id that corresponds to the selected joy,
-		// i.e. its realpath is the same as the selected joy's one
 
 		while ((entry = readdir(dev_dir)) != nullptr)
 		{
 			res = strstr(entry->d_name, "-joystick");
 			// filter entries
 			if (res == nullptr)  // skip device if it's not a joystick
-			{
 				continue;
-			}
 
 			const auto current_path = std::string(path) + "/" + entry->d_name;
 			res = realpath(current_path.c_str(), realpath_buf);
 			if (res == nullptr)
-			{
 				continue;
-			}
 
 			const std::string dev_real(realpath_buf);
 			if (dev_real == joy_dev_real)
@@ -276,9 +311,7 @@ namespace milo
 
 		// if no corresponding ID device was found, the autodetection won't work
 		if (joy_dev_id.empty())
-		{
 			return "";
-		}
 
 		const auto joy_dev_id_prefix = joy_dev_id.substr(0, joy_dev_id.length() - strlen("-joystick"));
 		std::string event_dev;
@@ -290,14 +323,12 @@ namespace milo
 		{
 			res = strstr(entry->d_name, "-event-joystick");
 			if (res == nullptr)  // skip device if it's not an event joystick
-			{
 				continue;
-			}
 
 			const auto current_path = std::string(path) + "/" + entry->d_name;
 			if (current_path.find(joy_dev_id_prefix) != std::string::npos)
 			{
-				std::cout << "Found force feedback event device: " << current_path << std::endl;
+	            LogManager::get()->status("[JOYSTICK] Found force feedback event device:  " + current_path, true);
 				event_dev = current_path;
 				break;
 			}
@@ -309,9 +340,9 @@ namespace milo
     //---------------------------------------------------------------------------------------------------------------------
 	bool JoystickBackend::openJoy(const std::string &_joy, const std::string &_ff)
 	{
-		if(_joy.empty() || _ff.empty())
+		if (_joy.empty() || _ff.empty())
 		{
-			std::cout << "Joy name or ff name is empty" << std::endl;
+			LogManager::get()->error("[JOYSTICK] Joy name or ff name is empty", true);
 			return false;
 		}
 
@@ -319,31 +350,32 @@ namespace milo
 		while (true)
 		{
 			fd_ = open(_joy.c_str(), O_RDONLY);
+
 			if (fd_ != -1)
 			{	
 				// hack for initial state data
 				close(fd_);
 				fd_ = open(_joy.c_str(), O_RDONLY);
 			}
+
 			if (fd_ != -1)
-			{
 				break;
-			}
+
 			if (first_fault)
 			{
-				std::cout << "Couldn't open joystick " << _joy.c_str() << " Retry every second" << std::endl;
+				LogManager::get()->error("[JOYSTICK] Couldn't open joystick " + _joy + " Retry every second", true);
 				first_fault = false;
 			}
 			sleep(1.0);
 		}
 
 		ff_ = open(_ff.c_str(), O_RDWR);
-		if(ff_ == -1)
+		if (ff_ == -1)
 			return false;
 
 		// Set the gain of the device
 		int gain = 100;           // between 0 and 100 
-		struct input_event ie;      // structure used to communicate with the driver
+		struct input_event ie; 
 
 		ie.type = EV_FF;
 		ie.code = FF_GAIN;
@@ -351,7 +383,8 @@ namespace milo
 
 		if (write(ff_, &ie, sizeof(ie)) == -1)
 		{
-			std::cout << "Couldn't set gain on joystick force feedback: " << strerror(errno) << std::endl;
+			std::string error = strerror(errno);
+			LogManager::get()->warning("[JOYSTICK] Couldn't set gain on joystick force feedback, Error: " + error, true);
 		}
 
 		memset(&joyEffect_, 0, sizeof(joyEffect_));
@@ -365,7 +398,6 @@ namespace milo
 
 		int ret = ioctl(ff_, EVIOCSFF, &joyEffect_);
 
-		// TODO: make this params configurable
 		deadzone_ = 0.1;
 		scale_ = -1. / (1. - deadzone_) / 32767.;
 		unscaledDeadzone_ = 32767. * deadzone_;
@@ -375,12 +407,6 @@ namespace milo
 		return true;
 	}
 
-    //---------------------------------------------------------------------------------------------------------------------
-	bool JoystickBackend::closeJoy()
-	{
-		if( (close(ff_) || close(fd_)) < 0)
-			return true;
-		else
-			return false;
-	}
+}
+}
 }

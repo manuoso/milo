@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -19,36 +19,47 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //---------------------------------------------------------------------------------------------------------------------
 
-#include "milo/driver/sockets/CommandSocket.h"
+
+#include "milo/modules/command/driver/CommandSocket.h"
 
 namespace milo{
+namespace modules{
+namespace command{
+namespace driver{
+
+    using namespace milo::modules::logger;
+
     //---------------------------------------------------------------------------------------------------------------------
     CommandSocket::CommandSocket(std::string _ip, int _port)
     {
         remotEndpoint_ = boost::asio::ip::udp::endpoint(boost::asio::ip::address::from_string(_ip), _port);
-        if(create(38065)){
+        if (create(38065))
+        {
             sendTime_ = std::chrono::high_resolution_clock::now();
             receiveTime_ = std::chrono::high_resolution_clock::now();
             buffer_ = std::vector<unsigned char>(1024);
             listen();
-        }else{
-            std::cout << "[COMMAND_SOCKET] Socket not initialized" << std::endl;
+        }
+        else
+        {
+            LogManager::get()->error("[COMMAND_SOCKET] Socket not initialized", true);
         }
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    CommandSocket::~CommandSocket(){
+    CommandSocket::~CommandSocket()
+    {
         close();
         delete socket_;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
-    bool CommandSocket::isInit(){
-        if(socket_ != nullptr){
+    bool CommandSocket::isInit()
+    {
+        if (socket_ != nullptr)
             return true;            
-        }else{
+        else
             return false;
-        }
     }
 
     //---------------------------------------------------------------------------------------------------------------------
@@ -57,8 +68,9 @@ namespace milo{
         std::lock_guard<std::mutex> lock(mtx_);
         receiving_ = false;
 
-        if (waiting_) {
-            std::cout << "[COMMAND_SOCKET] Error TIMEOUT" << std::endl;
+        if (waiting_) 
+        {
+            LogManager::get()->warning("[COMMAND_SOCKET] Error TIMEOUT", true);
             waiting_ = false;
         }
     }
@@ -96,15 +108,15 @@ namespace milo{
     {
         std::lock_guard<std::mutex> lock(mtx_);
 
-        if (!waiting_) {
-            // std::cout << "Sending: " << _cmd << std::endl;
+        if (!waiting_) 
+        {
+            LogManager::get()->status("[COMMAND_SOCKET] sending: " + _cmd, false);
             socket_->send_to(boost::asio::buffer(_cmd), remotEndpoint_);
             sendTime_ = std::chrono::high_resolution_clock::now();
 
             // Wait for a response for all commands except "rc"
-            if (_cmd.rfind("rc", 0) != 0) {
+            if (_cmd.rfind("rc", 0) != 0) 
                 waiting_ = true;
-            }
         }
     }
 
@@ -115,9 +127,8 @@ namespace milo{
 
         receiveTime_ = std::chrono::high_resolution_clock::now();
 
-        if (!receiving_) {
+        if (!receiving_) 
             receiving_ = true;
-        }
 
         std::string str = std::string(buffer_.begin(), buffer_.begin() + r);
 
@@ -125,4 +136,7 @@ namespace milo{
         waiting_ = false;
     }
 
+}
+}
+}
 }

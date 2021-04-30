@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -19,48 +19,66 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //---------------------------------------------------------------------------------------------------------------------
 
-// Those class are based in: https://github.com/clydemcqueen/tello_ros/blob/master/tello_driver/
 
-#ifndef MILO_SOCKETS_TELLO_H_
-#define MILO_SOCKETS_TELLO_H_
+#ifndef __MILO_MODULES_COMMAND_TELLO_COMMAND_H__
+#define __MILO_MODULES_COMMAND_TELLO_COMMAND_H__ 1
 
-#include <thread>
-#include <mutex>
-#include <chrono>
-#include <iostream>
+#include "milo/modules/logger/LogManager.h"
 
-#include <boost/array.hpp>
-#include <boost/asio.hpp>
+#include "milo/modules/command/driver/CommandSocket.h"
 
 namespace milo{
-    class TelloSocket{
+namespace modules{
+namespace command{
+
+    class TelloCommand
+    {
         public:
-            bool close();
+            TelloCommand(std::string _ip, int _port);
 
-            bool receiving();
+            ~TelloCommand();
 
-            virtual void timeout();
+            bool isInit();
 
-        protected:
-            bool create(int _port);
+            bool isReceiving();
 
-            void listen();
+            bool isWaiting();
 
-            virtual void process_packet(size_t r) = 0;
+            bool isRespond();
 
-        protected:
-            boost::asio::io_service ioService_;         
-            boost::asio::ip::udp::socket *socket_ = nullptr;            
+            void timeout();
 
-            std::thread thread_;                  
-            std::mutex mtx_;               
+            float timeSendRecv();
 
-            bool run_ = false;
-            bool receiving_ = false;              
-            std::chrono::high_resolution_clock::time_point receiveTime_;           
-            std::vector<unsigned char> buffer_;   
+            float timeFromLastRecv();
+
+            void setControl();
+
+            void setCamera(bool _enable);
+
+            void takeoff();
+
+            void land();
+            
+            void emergency();
+
+            void rc_control(int _roll, int _pitch, int _throttle, int _yaw);
+
+            void move(std::string _dir, int _dist);
+
+            void rotate(std::string _dir, int _angle);
+
+            void send(std::string _cmd);
+
+        private:
+            driver::CommandSocket *commandSocket_ = nullptr;
+
+            std::mutex mtx_;    
 
     };
+
+}
+}
 }
 
 #endif
