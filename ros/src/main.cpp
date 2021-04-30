@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -19,42 +19,44 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //---------------------------------------------------------------------------------------------------------------------
 
+
 #include "milo_node.h"
 
 MiloNode *miloNode;
 
 //---------------------------------------------------------------------------------------------------------------------
 // Replacement handler
-void finishHandler(int _sig){
-    std::cout << "[MILO_NODE] Finish Handler: Catch signal " << _sig << std::endl;
+void finishHandler(int _sig)
+{
+    LogManager::get()->status("[MILO_NODE] Finish Handler: Catch signal " + std::to_string(_sig), true);
     bool finish = miloNode->finalize();
-    if(!finish){
-        std::cout << "[MILO_NODE] App not finished cleanly, please check it." << std::endl;
-    }
+    if (!finish)
+        LogManager::get()->error("[MILO_NODE] App not finished cleanly, please check it", true);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 // Replacement "shutdown" XMLRPC callback
-void shutdownCallback(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue& result){
+void shutdownCallback(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue& result)
+{
     int num_params = 0;
     if (params.getType() == XmlRpc::XmlRpcValue::TypeArray)
         num_params = params.size();
 
-    if (num_params > 1){
+    if (num_params > 1)
+    {
         std::string reason = params[1];
-        ROS_WARN("[MILO_NODE] Shutdown request received. Reason: [%s]", reason.c_str());
+        LogManager::get()->error("[MILO_NODE] Shutdown request received. Reason: " + reason, true);
         bool finish = miloNode->finalize();
-        if(!finish){
-            std::cout << "[MILO_NODE] App not finished cleanly, please check it." << std::endl;
-        }
+        if (!finish)
+            LogManager::get()->error("[MILO_NODE] App not finished cleanly, please check it", true);
     }
 
     result = ros::xmlrpc::responseInt(1, "", 0);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-int main(int _argc, char **_argv) {
-
+int main(int _argc, char **_argv) 
+{
     signal(SIGINT, finishHandler);
     signal(SIGTERM, finishHandler);
 
@@ -70,13 +72,15 @@ int main(int _argc, char **_argv) {
 
     miloNode = new MiloNode();
     
-    if(!miloNode->init()){
-        std::cout << "Error initializing the application" << std::endl;
+    if (!miloNode->init())
+    {
+        LogManager::get()->error("[MILO_NODE] Error initializing the application", true);
         return -1;
     }
 
     bool finish = false;
-	while(!finish){
+	while (!finish)
+    {
         finish = miloNode->run();
 	}
 

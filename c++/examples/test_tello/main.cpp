@@ -28,40 +28,38 @@
 
 using namespace milo;
 
-int main(int _argc, char **_argv){
+int main(int _argc, char **_argv)
+{
 
     MILO *drone = nullptr;
     drone = MILO::create(true, true);
 
     drone->command()->setControl();
-    while(drone->command()->isWaiting()){
+    while (drone->command()->isWaiting())
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
 
-    if(drone->command()->isRespond()){
+    if (drone->command()->isRespond())
         std::cout << "Received TRUE" << std::endl;
-    }else{
+    else
         std::cout << "Received FALSE" << std::endl;
-    }
 
     drone->command()->setCamera(true);
-    while(drone->command()->isWaiting()){
+    while (drone->command()->isWaiting())
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
 
-    if(drone->command()->isRespond()){
+    if (drone->command()->isRespond())
         std::cout << "Received TRUE" << std::endl;
-    }else{
+    else
         std::cout << "Received FALSE" << std::endl;
-    }
 
     std::thread thread = std::thread(
         [&]()
         {
-            while(drone->camera()->isReceiving()){
+            while (drone->camera()->isReceiving())
+            {
                 cv::Mat img = drone->camera()->getImage();
 
-                if(img.empty())
+                if (img.empty())
                     continue;
 
                 // Display
@@ -73,14 +71,14 @@ int main(int _argc, char **_argv){
         });
 
     int cont = 0;
-    while(true){
+    while (true)
+    {
         int bat = drone->telemetry()->getBattery();
         std::cout << "Battery: " << bat << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(1));
         cont++;
-        if(cont == 10){
+        if(cont == 10)
             drone->camera()->timeout();
-        }
     }
 
     return 0;

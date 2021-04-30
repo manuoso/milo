@@ -71,7 +71,7 @@ namespace driver{
 
         if (waiting_) 
         {
-            LogManager::get()->warning("[COMMAND_SOCKET] Error TIMEOUT", true);
+            LogManager::get()->error("[COMMAND_SOCKET] Error TIMEOUT", true);
             waiting_ = false;
         }
     }

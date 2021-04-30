@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -30,8 +30,8 @@
 bool run = true;
 
 //---------------------------------------------------------------------------------------------------------------------
-int main(int _argc, char **_argv) {
-
+int main(int _argc, char **_argv) 
+{
     // Override SIGINT handler
     ros::init(_argc, _argv, "milo_control");
     
@@ -49,7 +49,8 @@ int main(int _argc, char **_argv) {
 
     std::thread *threadRC;
     bool finish = false;
-	while(!finish){
+	while(!finish)
+    {
         int mode = 0;
         std::cout << "Press: " << std::endl;
         std::cout << "(1) for takeoff" << std::endl;
@@ -59,19 +60,21 @@ int main(int _argc, char **_argv) {
         std::cout << "(9) for exit" << std::endl;
         std::cin >> mode;
 
-        switch(mode){
+        switch (mode){
             case 1:
             {   
                 std_srvs::SetBool srv;
                 srv.request.data = true;
 
-                if(takeoffReq.call(srv)){
-                    if(srv.response.success){
+                if(takeoffReq.call(srv))
+                {
+                    if(srv.response.success)
                         std::cout << "Service of TAKE OFF success" << std::endl;
-                    }else{
+                    else
                         std::cout << "Service of TAKE OFF failed" << std::endl;
-                    }
-                }else{
+                }
+                else
+                {
                     std::cout << "Failed to call service of TAKE OFF" << std::endl;
                 }
                 break;
@@ -105,7 +108,8 @@ int main(int _argc, char **_argv) {
                 threadRC = new std::thread(
                 [&]()
                 {
-                    while(run){
+                    while(run)
+                    {
                         rcPub.publish(msgRC);
                         std::this_thread::sleep_for(std::chrono::milliseconds(10));
                     }
@@ -114,13 +118,16 @@ int main(int _argc, char **_argv) {
                 int finishRC = 0;
                 bool runSend = true;
                 std::cout << "Press -1 to finish send rc: ";
-                while(runSend){
+                while(runSend)
+                {
                     std::cin >> finishRC;
-                    if (finishRC == -1){
+                    if (finishRC == -1)
+                    {
                         run = false;
                         runSend = false;
                     }
-                    else {
+                    else 
+                    {
                         std::cout << "\nERROR. Try again" << std::endl;
                     }
                 }
@@ -132,13 +139,15 @@ int main(int _argc, char **_argv) {
                 std_srvs::SetBool srv;
                 srv.request.data = true;
 
-                if(landReq.call(srv)){
-                    if(srv.response.success){
+                if(landReq.call(srv))
+                {
+                    if(srv.response.success)
                         std::cout << "Service of LAND success" << std::endl;
-                    }else{
+                    else
                         std::cout << "Service of LAND failed" << std::endl;
-                    }
-                }else{
+                }
+                else
+                {
                     std::cout << "Failed to call service of LAND" << std::endl;
                 }
                 break;
@@ -148,13 +157,15 @@ int main(int _argc, char **_argv) {
                 std_srvs::SetBool srv;
                 srv.request.data = true;
 
-                if(emergencyReq.call(srv)){
-                    if(srv.response.success){
+                if(emergencyReq.call(srv))
+                {
+                    if(srv.response.success)
                         std::cout << "Service of EMERGENCY success" << std::endl;
-                    }else{
+                    else
                         std::cout << "Service of EMERGENCY failed" << std::endl;
-                    }
-                }else{
+                }
+                else
+                {
                     std::cout << "Failed to call service of EMERGENCY" << std::endl;
                 }
                 break;

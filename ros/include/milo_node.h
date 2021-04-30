@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -19,13 +19,14 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //---------------------------------------------------------------------------------------------------------------------
 
+
 #ifndef MILO_NODE_H_
 #define MILO_NODE_H_
 
+#include <signal.h>
+
 #include <ros/ros.h>
 #include <ros/xmlrpc_manager.h>
-
-#include <signal.h>
 
 #include <tf/tf.h>
 
@@ -47,11 +48,13 @@
 
 #include "milo/milo.h"
 
+using namespace milo;
 
 class MiloNode
 {
     public:
-        enum class eState{
+        enum class eState
+        {
             WAIT,
             LAND,
             TAKEOFF,
@@ -60,8 +63,8 @@ class MiloNode
             EXIT
         };
         
-        MiloNode(){};
-        ~MiloNode(){};
+        MiloNode();
+        ~MiloNode();
 
         bool init();
 
@@ -86,7 +89,7 @@ class MiloNode
     private:
         eState state_;
 
-        milo::MILO *drone_ = nullptr;
+        MILO *drone_ = nullptr;
 
         std::thread telemThread_, camThread_;
 
@@ -94,7 +97,7 @@ class MiloNode
         ros::Subscriber rcSub_;
         ros::ServiceServer landSrv_, takeoffSrv_, emergencySrv_;
 
-        bool fin_ = false;
+        bool fin_;
 
 };
 

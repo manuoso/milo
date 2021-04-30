@@ -23,8 +23,6 @@
 #include "milo/milo.h"
 
 namespace milo{
-
-    using namespace milo::modules::logger;
     
     MILO *MILO::milo_ = nullptr;
 

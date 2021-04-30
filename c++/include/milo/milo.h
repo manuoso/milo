@@ -34,6 +34,8 @@ namespace milo{
     using namespace modules::telemetry;
     using namespace modules::camera;
 
+    using namespace milo::modules::logger;
+
     class MILO {
         public:
             //---------------------------------------------------------------------------------------------------------------------
