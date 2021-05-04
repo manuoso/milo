@@ -35,4 +35,4 @@ macro(build_ros_tool tool_name tool_files)
 	target_link_libraries(${tool_name} LINK_PUBLIC ${catkin_LIBRARIES})
 endmacro()
 
-build_ros_tool(milo_control milo_control/main.cpp)
+build_ros_tool(test_ros_tello test_ros_tello/main.cpp)

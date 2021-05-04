@@ -21,40 +21,46 @@
 
 
 cmake_minimum_required (VERSION 3.14 FATAL_ERROR)
-project(milo VERSION 0.1 LANGUAGES C CXX)
+project(milo VERSION 1.0 LANGUAGES C CXX)
 
 #########################################
-######	   Configure project       ######
+######	Configure project    
 #########################################
 
 # Some build options
-option(BUILD_TOOLS "Build tools module" OFF)
+option(BUILD_APPS "Build Applications module" OFF)
 option(BUILD_EXAMPLES "Build example module" ON)
 
 #########################################
-###### Loading 3rd party libraries ######
+######	Loading 3rd party libraries
 #########################################
 
 if( NOT CMAKE_BUILD_TYPE )
-  set( CMAKE_BUILD_TYPE Release CACHE STRING
-       "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
-       FORCE )
+  	set( CMAKE_BUILD_TYPE Release CACHE STRING
+		"Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+		FORCE )
 endif()
-
-# set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/" ${CMAKE_MODULE_PATH})
 
 list(APPEND MILO_DEFINITIONS "")
 
 #########################################
 
 set(Boost_USE_MULTITHREAD ON)
-
 find_package(Boost REQUIRED COMPONENTS system thread regex)
 
-find_package(OpenCV)
+find_package(OpenCV REQUIRED)
+
+# Look for <linux/joystick.h>
+include(CheckIncludeFiles)
+check_include_files(linux/joystick.h HAVE_LINUX_JOYSTICK_H)
+if(HAVE_LINUX_JOYSTICK_H)
+
+else()
+  	message(WARNING "Not found <linux/joystick.h>")
+endif()
 
 #########################################
-######			 Library           ######
+######	Library
 #########################################
 
 # Collect all sources
@@ -80,7 +86,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC ${OpenCV_LIBRARIES})
 
 #########################################
-######			Documentation	   ######
+######	Documentation
 #########################################
 
 # find_package(Doxygen)
@@ -93,15 +99,15 @@ target_link_libraries(${PROJECT_NAME} LINK_PUBLIC ${OpenCV_LIBRARIES})
 # endif(DOXYGEN_FOUND)
 
 #########################################
-######			 Tools             ######
+######	Applications        
 #########################################
 
-if(${BUILD_TOOLS})
-	add_subdirectory(tools)
-endif(${BUILD_TOOLS})
+if(${BUILD_APPS})
+	add_subdirectory(applications)
+endif(${BUILD_APPS})
 
 #########################################
-######			 Examples          ######
+######	Examples
 #########################################
 
 if(${BUILD_EXAMPLES})
@@ -109,27 +115,27 @@ if(${BUILD_EXAMPLES})
 endif(${BUILD_EXAMPLES})
 
 #########################################
-######			 Install           ######
+######	Install
 #########################################
 
 include(CMakePackageConfigHelpers)
 
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/usr/local")
+  	set(CMAKE_INSTALL_PREFIX "/usr/local")
 endif() 
 
 install(TARGETS milo
-        EXPORT miloTargets
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        INCLUDES DESTINATION ${CMAKE_INSTALL_PREFIX}
-        )
+	EXPORT miloTargets
+	LIBRARY DESTINATION lib
+	ARCHIVE DESTINATION lib
+	INCLUDES DESTINATION ${CMAKE_INSTALL_PREFIX}
+	)
 
 write_basic_package_version_file(
-		miloConfigVersion.cmake
-    VERSION ${PACKAGE_VERSION}
-    COMPATIBILITY AnyNewerVersion
-    )
+	miloConfigVersion.cmake
+	VERSION ${PACKAGE_VERSION}
+	COMPATIBILITY AnyNewerVersion
+	)
 
 # This installs the include folder
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.h")
@@ -144,17 +150,17 @@ install(EXPORT miloTargets
     DESTINATION lib/cmake/milo
     )
 
-configure_file(miloConfig.cmake.in miloConfig.cmake @ONLY)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/miloConfig.cmake"
-        DESTINATION lib/cmake/milo
-        )
+configure_file(cmake/miloConfig.cmake.in cmake/miloConfig.cmake @ONLY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/cmake/miloConfig.cmake"
+	DESTINATION lib/cmake/milo
+	)
 
 # uninstall target 
 if(NOT TARGET uninstall) 
-  configure_file( 
-      "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in" 
-      "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" 
-      IMMEDIATE @ONLY) 
+	configure_file( 
+		"${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in" 
+		"${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake" 
+		IMMEDIATE @ONLY) 
  
   add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake) 
 endif() 

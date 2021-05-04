@@ -1,4 +1,4 @@
-![](logo.png)
+![](doc/logo.png)
 
 # milo
 
