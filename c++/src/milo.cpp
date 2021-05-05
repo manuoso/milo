@@ -35,10 +35,10 @@ namespace milo{
     //---------------------------------------------------------------------------------------------------------------------
 
 	//---------------------------------------------------------------------------------------------------------------------
-	MILO * MILO::create(bool _initState, bool _initCamera) 
-    {
+	MILO * MILO::create(bool _useCout, bool _initState, bool _initCamera) 
+    {   
 		if (!milo_)
-			milo_ = new MILO(_initState, _initCamera);
+			milo_ = new MILO(_useCout, _initState, _initCamera);
         else
             LogManager::get()->error("[MILO] Someone tried to reinitialize the MILO system", true);
 
@@ -75,10 +75,12 @@ namespace milo{
     //---------------------------------------------------------------------------------------------------------------------
 
     //---------------------------------------------------------------------------------------------------------------------
-    MILO::MILO(bool _initState, bool _initCamera) 
+    MILO::MILO(bool _useCout, bool _initState, bool _initCamera) 
     {
+        useCout_ = _useCout;
+
         LogManager::init("log");
-        command_ = new TelloCommand("192.168.10.1", 8889);
+        command_ = new TelloCommand(useCout_, "192.168.10.1", 8889);
 
         if (command_->isInit())
             timeoutThread();
@@ -86,10 +88,10 @@ namespace milo{
             command_ = nullptr;
 
         if (_initState && command_ != nullptr)
-            telemetry_ = new TelloTelemetry(8890);
+            telemetry_ = new TelloTelemetry(useCout_, 8890);
         
         if (_initCamera && command_ != nullptr)
-            camera_ = new TelloCamera(11111);
+            camera_ = new TelloCamera(useCout_, 11111);
     }
 
     //---------------------------------------------------------------------------------------------------------------------

@@ -57,7 +57,7 @@ namespace telemetry{
             };
 
         public:
-            TelloTelemetry(int _port);
+            TelloTelemetry(bool _useCout, int _port);
 
             ~TelloTelemetry();
 
@@ -93,6 +93,7 @@ namespace telemetry{
             std::thread thread_;                  
             std::mutex mtx_;    
             bool run_;
+            bool useCout_;
 
     };
 

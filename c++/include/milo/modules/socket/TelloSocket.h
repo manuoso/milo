@@ -62,6 +62,8 @@ namespace socket{
             std::thread thread_;                  
             std::mutex mtx_;               
 
+            bool useCout_ = false;
+            
             bool run_ = false;
             bool receiving_ = false;              
             std::chrono::high_resolution_clock::time_point receiveTime_;           

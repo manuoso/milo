@@ -29,13 +29,14 @@ namespace command{
     using namespace milo::modules::logger;
 
     //---------------------------------------------------------------------------------------------------------------------
-    TelloCommand::TelloCommand(std::string _ip, int _port)
-    {
-        commandSocket_ = new driver::CommandSocket(_ip, _port);
+    TelloCommand::TelloCommand(bool _useCout, std::string _ip, int _port)
+    {   
+        useCout_ = _useCout;
+        commandSocket_ = new driver::CommandSocket(useCout_, _ip, _port);
         if (commandSocket_ != nullptr)
-            LogManager::get()->status("[TELLO_COMMAND] Init Command Socket", true);
+            LogManager::get()->status("[TELLO_COMMAND] Init Command Socket", useCout_);
         else
-            LogManager::get()->error("[TELLO_COMMAND] Not initialize Command Socket", true);
+            LogManager::get()->error("[TELLO_COMMAND] Not initialize Command Socket", useCout_);
 
     }
 

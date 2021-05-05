@@ -29,18 +29,20 @@ namespace joystick{
     using namespace milo::modules::logger;
 
     //---------------------------------------------------------------------------------------------------------------------
-	JoystickBackend::JoystickBackend() :
+	JoystickBackend::JoystickBackend(bool _useCout) :
 		init_(false), fd_(-1), ff_(-1)
 	{
+		useCout_ = _useCout;
 		auto joyName = identifyJoy();
 		auto ffName = identifyFF(joyName.c_str());
 		init_ = openJoy(joyName, ffName);
 	}
 
     //---------------------------------------------------------------------------------------------------------------------
-	JoystickBackend::JoystickBackend(const std::string &_name) :
+	JoystickBackend::JoystickBackend(bool _useCout, const std::string &_name) :
 			init_(false), fd_(-1), ff_(-1)
 	{
+		useCout_ = _useCout;
 		auto ffName = identifyFF(_name.c_str());
 		init_ = openJoy(_name.c_str(), ffName);
 	}
@@ -210,7 +212,7 @@ namespace joystick{
 				}
 					break;
 				default:
-		            LogManager::get()->warning("[JOYSTICK] Unknown event type. Time: " + std::to_string(event_.time) + " Value: " + std::to_string(event_.value) + " Type: " + std::to_string(event_.type) + " Number: " + std::to_string(event_.number), true);
+		            LogManager::get()->warning("[JOYSTICK] Unknown event type. Time: " + std::to_string(event_.time) + " Value: " + std::to_string(event_.value) + " Type: " + std::to_string(event_.type) + " Number: " + std::to_string(event_.number), useCout_);
 					break;
 			}
 		}
@@ -228,7 +230,7 @@ namespace joystick{
 		auto dev_dir = opendir(path);
 		if (dev_dir == nullptr)
 		{
-            LogManager::get()->error("[JOYSTICK] Couldn't open /dev/input", true);
+            LogManager::get()->error("[JOYSTICK] Couldn't open /dev/input", useCout_);
 			return "";
 		}
 
@@ -259,7 +261,7 @@ namespace joystick{
 			closedir(dev_dir);
 
 			std::string name = current_joy_name; // TODO: DELETE THIS VARIABLE
-            LogManager::get()->status("[JOYSTICK] Found Joystick: " + name + " in: " + current_path.c_str(), true);
+            LogManager::get()->status("[JOYSTICK] Found Joystick: " + name + " in: " + current_path.c_str(), useCout_);
 
 			return current_path;
 		}
@@ -283,7 +285,7 @@ namespace joystick{
 		if (dev_dir == nullptr)
 		{
 			std::string error = strerror(errno);
-            LogManager::get()->error("[JOYSTICK] Couldn't open /dev/input/by-id Error: " + error, true);
+            LogManager::get()->error("[JOYSTICK] Couldn't open /dev/input/by-id Error: " + error, useCout_);
 			return "";
 		}
 
@@ -332,7 +334,7 @@ namespace joystick{
 			const auto current_path = std::string(path) + "/" + entry->d_name;
 			if (current_path.find(joy_dev_id_prefix) != std::string::npos)
 			{
-	            LogManager::get()->status("[JOYSTICK] Found force feedback event device:  " + current_path, true);
+	            LogManager::get()->status("[JOYSTICK] Found force feedback event device:  " + current_path, useCout_);
 				event_dev = current_path;
 				break;
 			}
@@ -346,7 +348,7 @@ namespace joystick{
 	{
 		if (_joy.empty() || _ff.empty())
 		{
-			LogManager::get()->error("[JOYSTICK] Joy name or ff name is empty", true);
+			LogManager::get()->error("[JOYSTICK] Joy name or ff name is empty", useCout_);
 			return false;
 		}
 
@@ -367,7 +369,7 @@ namespace joystick{
 
 			if (first_fault)
 			{
-				LogManager::get()->error("[JOYSTICK] Couldn't open joystick " + _joy + " Retry every second", true);
+				LogManager::get()->error("[JOYSTICK] Couldn't open joystick " + _joy + " Retry every second", useCout_);
 				first_fault = false;
 			}
 			sleep(1.0);
@@ -388,7 +390,7 @@ namespace joystick{
 		if (write(ff_, &ie, sizeof(ie)) == -1)
 		{
 			std::string error = strerror(errno);
-			LogManager::get()->warning("[JOYSTICK] Couldn't set gain on joystick force feedback, Error: " + error, true);
+			LogManager::get()->warning("[JOYSTICK] Couldn't set gain on joystick force feedback, Error: " + error, useCout_);
 		}
 
 		memset(&joyEffect_, 0, sizeof(joyEffect_));

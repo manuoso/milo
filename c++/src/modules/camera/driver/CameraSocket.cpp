@@ -39,9 +39,10 @@ namespace driver{
     //    generating a frame. Presumably the keyframe is stored in the parser and referenced later.
 
     //---------------------------------------------------------------------------------------------------------------------
-    CameraSocket::CameraSocket(int _port) 
+    CameraSocket::CameraSocket(bool _useCout, int _port) 
         : seq_buffer_next_(0), seq_buffer_num_packets_(0)
     {
+        useCout_ = _useCout;
         if (create(_port))
         {
             buffer_ = std::vector<unsigned char>(2048);
@@ -50,7 +51,7 @@ namespace driver{
         }
         else
         {
-            LogManager::get()->error("[CAMERA_SOCKET] Socket not initialized", true);
+            LogManager::get()->error("[CAMERA_SOCKET] Socket not initialized", useCout_);
         }
     }
 

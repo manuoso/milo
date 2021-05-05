@@ -32,7 +32,7 @@ int main(int _argc, char **_argv)
 {
 
     MILO *drone = nullptr;
-    drone = MILO::create(true, true);
+    drone = MILO::create(true, true, true);
 
     drone->command()->setControl();
     while (drone->command()->isWaiting())

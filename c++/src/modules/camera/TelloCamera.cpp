@@ -29,13 +29,14 @@ namespace camera{
     using namespace milo::modules::logger;
 
     //---------------------------------------------------------------------------------------------------------------------
-    TelloCamera::TelloCamera(int _port)
+    TelloCamera::TelloCamera(bool _useCout, int _port)
     {
-        cameraSocket_ = new driver::CameraSocket(_port);
+        useCout_ = _useCout;
+        cameraSocket_ = new driver::CameraSocket(useCout_, _port);
         if (cameraSocket_ != nullptr)
-            LogManager::get()->status("[TELLO_CAMERA] Init Camera Socket", true);
+            LogManager::get()->status("[TELLO_CAMERA] Init Camera Socket", useCout_);
         else
-            LogManager::get()->error("[TELLO_CAMERA] Not initialize Camera Socket", true);
+            LogManager::get()->error("[TELLO_CAMERA] Not initialize Camera Socket", useCout_);
     }
 
     //---------------------------------------------------------------------------------------------------------------------

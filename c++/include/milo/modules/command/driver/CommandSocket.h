@@ -37,7 +37,7 @@ namespace driver{
     class CommandSocket : public socket::TelloSocket
     {
         public:
-            CommandSocket(std::string _ip, int _port);
+            CommandSocket(bool _useCout, std::string _ip, int _port);
 
             virtual ~CommandSocket();
 

@@ -34,7 +34,7 @@ namespace command{
     class TelloCommand
     {
         public:
-            TelloCommand(std::string _ip, int _port);
+            TelloCommand(bool _useCout, std::string _ip, int _port);
 
             ~TelloCommand();
 
@@ -73,6 +73,7 @@ namespace command{
         private:
             driver::CommandSocket *commandSocket_ = nullptr;
 
+            bool useCout_;
             std::mutex mtx_;    
 
     };

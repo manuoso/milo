@@ -56,8 +56,8 @@ namespace joystick{
     class JoystickBackend
     {
         public:
-            JoystickBackend();
-            JoystickBackend(const std::string &_name);
+            JoystickBackend(bool _useCout);
+            JoystickBackend(bool _useCout, const std::string &_name);
 
             ~JoystickBackend();
 
@@ -82,6 +82,7 @@ namespace joystick{
 
         private:
             bool init_;
+            bool useCout_;
             int fd_, ff_;
             int axisCount_, buttonCount_;
 

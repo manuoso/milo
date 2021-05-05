@@ -30,8 +30,9 @@ namespace driver{
     using namespace milo::modules::logger;
 
     //---------------------------------------------------------------------------------------------------------------------
-    StateSocket::StateSocket(int _port)
+    StateSocket::StateSocket(bool _useCout, int _port)
     {
+        useCout_ = _useCout;
         if (create(_port))
         {
             buffer_ = std::vector<unsigned char>(1024);
@@ -39,7 +40,7 @@ namespace driver{
         }
         else
         {
-            LogManager::get()->status("[STATE_SOCKET] Socket not initialized", false);
+            LogManager::get()->status("[STATE_SOCKET] Socket not initialized", useCout_);
         }
     }
 

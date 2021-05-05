@@ -54,9 +54,12 @@ find_package(OpenCV REQUIRED)
 include(CheckIncludeFiles)
 check_include_files(linux/joystick.h HAVE_LINUX_JOYSTICK_H)
 if(HAVE_LINUX_JOYSTICK_H)
-
+	file(GLOB_RECURSE JOY_SOURCE_FILES "src/modules/joystick/*.c" "src/modules/joystick/*.cpp")
+	file(GLOB_RECURSE JOY_HEADER_FILES "include/milo/modules/joystick/*.h" "include/milo/modules/joystick/*.hpp" "include/milo/modules/joystick/*.inl")
 else()
   	message(WARNING "Not found <linux/joystick.h>")
+	file(GLOB_RECURSE JOY_SOURCE_FILES "")
+	file(GLOB_RECURSE JOY_HEADER_FILES "")
 endif()
 
 #########################################
@@ -64,10 +67,31 @@ endif()
 #########################################
 
 # Collect all sources
-file(GLOB_RECURSE MILO_SOURCE_FILES "src/*.c" "src/*.cpp")
-file(GLOB_RECURSE MILO_HEADER_FILES "include/*.inl" "include/*.h")
+file(GLOB_RECURSE CMD_SOURCE_FILES "src/modules/command/*.c" "src/modules/command/*.cpp")
+file(GLOB_RECURSE CMD_HEADER_FILES "include/milo/modules/command/*.h" "include/milo/modules/command/*.hpp" "include/milo/modules/command/*.inl")
 
-add_library(${PROJECT_NAME} SHARED ${MILO_SOURCE_FILES} ${MILO_HEADER_FILES})
+file(GLOB_RECURSE CAM_SOURCE_FILES "src/modules/camera/*.c" "src/modules/camera/*.cpp")
+file(GLOB_RECURSE CAM_HEADER_FILES "include/milo/modules/camera/*.h" "include/milo/modules/camera/*.hpp" "include/milo/modules/camera/*.inl")
+
+file(GLOB_RECURSE TEL_SOURCE_FILES "src/modules/telemetry/*.c" "src/modules/telemetry/*.cpp")
+file(GLOB_RECURSE TEL_HEADER_FILES "include/milo/modules/telemetry/*.h" "include/milo/modules/telemetry/*.hpp" "include/milo/modules/telemetry/*.inl")
+
+file(GLOB_RECURSE SOC_SOURCE_FILES "src/modules/socket/*.c" "src/modules/socket/*.cpp")
+file(GLOB_RECURSE SOC_HEADER_FILES "include/milo/modules/socket/*.h" "include/milo/modules/socket/*.hpp" "include/milo/modules/socket/*.inl")
+
+file(GLOB_RECURSE LOG_SOURCE_FILES "src/modules/logger/*.c" "src/modules/logger/*.cpp")
+file(GLOB_RECURSE LOG_HEADER_FILES "include/milo/modules/logger/*.h" "include/milo/modules/logger/*.hpp" "include/milo/modules/logger/*.inl")
+
+file(GLOB_RECURSE MILO_SOURCE_FILES "src/milo.c" "src/milo.cpp")
+file(GLOB_RECURSE MILO_HEADER_FILES "include/milo.inl" "include/milo.h")
+
+add_library(${PROJECT_NAME} SHARED ${MILO_SOURCE_FILES} ${MILO_HEADER_FILES} 
+									${JOY_SOURCE_FILES} ${JOY_HEADER_FILES}
+									${CMD_SOURCE_FILES} ${CMD_HEADER_FILES}
+									${CAM_SOURCE_FILES} ${CAM_HEADER_FILES}
+									${TEL_SOURCE_FILES} ${TEL_HEADER_FILES}
+									${SOC_SOURCE_FILES} ${SOC_HEADER_FILES}
+									${LOG_SOURCE_FILES} ${LOG_HEADER_FILES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include) 
 

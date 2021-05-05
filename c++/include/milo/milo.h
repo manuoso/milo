@@ -43,7 +43,7 @@ namespace milo{
 	        //---------------------------------------------------------------------------------------------------------------------
             
             /// Create the system. 
-            static MILO * create(bool _initState, bool _initCamera);
+            static MILO * create(bool _useCout, bool _initState, bool _initCamera);
 
             /// Close the system.
             static void close();
@@ -70,7 +70,7 @@ namespace milo{
 
         private:
             /// Constructor with given configuration for backend
-            MILO(bool _initState, bool _initCamera);
+            MILO(bool _useCout, bool _initState, bool _initCamera);
 
             /// Destructor
             virtual ~MILO(); 
@@ -85,6 +85,7 @@ namespace milo{
             TelloCamera *camera_ = nullptr;
 
             bool run_;
+            bool useCout_;
             std::thread thread_;                  
 
     };

@@ -34,7 +34,7 @@ namespace camera{
     class TelloCamera
     {
         public:
-            TelloCamera(int _port);
+            TelloCamera(bool _useCout, int _port);
 
             ~TelloCamera();
 
@@ -47,6 +47,7 @@ namespace camera{
         private:
             driver::CameraSocket *cameraSocket_ = nullptr;
 
+            bool useCout_;
             std::mutex mtx_;    
 
     };

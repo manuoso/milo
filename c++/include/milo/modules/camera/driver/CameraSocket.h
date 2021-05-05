@@ -43,7 +43,7 @@ namespace driver{
     class CameraSocket : public socket::TelloSocket
     {
         public:
-            CameraSocket(int _port);
+            CameraSocket(bool _useCout, int _port);
 
             virtual ~CameraSocket();
 

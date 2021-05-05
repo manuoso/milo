@@ -47,7 +47,7 @@ int main(int _argc, char **_argv)
 	MILO *drone = nullptr;
 	drone->createOnlyLogger();
 
-    jsbd = new JoystickBackend();
+    jsbd = new JoystickBackend(true);
     
 	std::string event_type = "";
 	int event_number = 0;

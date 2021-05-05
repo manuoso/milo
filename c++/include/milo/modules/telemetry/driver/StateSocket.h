@@ -39,7 +39,7 @@ namespace driver{
     class StateSocket : public socket::TelloSocket
     {
         public:
-            StateSocket(int _port);
+            StateSocket(bool _useCout, int _port);
 
             virtual ~StateSocket();
 

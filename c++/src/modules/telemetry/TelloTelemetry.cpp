@@ -29,18 +29,19 @@ namespace telemetry{
     using namespace milo::modules::logger;
 
     //---------------------------------------------------------------------------------------------------------------------
-    TelloTelemetry::TelloTelemetry(int _port)
+    TelloTelemetry::TelloTelemetry(bool _useCout, int _port)
         : run_(false)
     {
-        stateSocket_ = new driver::StateSocket(_port);
+        useCout_ = _useCout;
+        stateSocket_ = new driver::StateSocket(useCout_, _port);
         if (stateSocket_ != nullptr)
         {
-            LogManager::get()->status("[TELLO_TELEMETRY] Init State Socket", true);
+            LogManager::get()->status("[TELLO_TELEMETRY] Init State Socket", useCout_);
             decodeThread();
         }
         else
         {
-            LogManager::get()->error("[TELLO_TELEMETRY] Not initialize State Socket", true);
+            LogManager::get()->error("[TELLO_TELEMETRY] Not initialize State Socket", useCout_);
         }
     }
 

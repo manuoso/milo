@@ -30,9 +30,10 @@ namespace driver{
     using namespace milo::modules::logger;
 
     //---------------------------------------------------------------------------------------------------------------------
-    CommandSocket::CommandSocket(std::string _ip, int _port) 
+    CommandSocket::CommandSocket(bool _useCout, std::string _ip, int _port) 
         : waiting_(false), respond_(false)
     {
+        useCout_ = _useCout;
         remotEndpoint_ = boost::asio::ip::udp::endpoint(boost::asio::ip::address::from_string(_ip), _port);
         if (create(38065))
         {
@@ -43,7 +44,7 @@ namespace driver{
         }
         else
         {
-            LogManager::get()->error("[COMMAND_SOCKET] Socket not initialized", true);
+            LogManager::get()->error("[COMMAND_SOCKET] Socket not initialized", useCout_);
         }
     }
 
@@ -71,7 +72,7 @@ namespace driver{
 
         if (waiting_) 
         {
-            LogManager::get()->error("[COMMAND_SOCKET] Error TIMEOUT", true);
+            LogManager::get()->error("[COMMAND_SOCKET] Error TIMEOUT", useCout_);
             waiting_ = false;
         }
     }
