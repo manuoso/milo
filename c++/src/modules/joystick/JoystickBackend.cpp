@@ -27,6 +27,7 @@ namespace modules{
 namespace joystick{
 
     using namespace milo::modules::logger;
+    using namespace milo::modules::utils;
 
     //---------------------------------------------------------------------------------------------------------------------
 	JoystickBackend::JoystickBackend(bool _useCout) :
@@ -212,7 +213,7 @@ namespace joystick{
 				}
 					break;
 				default:
-		            LogManager::get()->warning("[JOYSTICK] Unknown event type. Time: " + std::to_string(event_.time) + " Value: " + std::to_string(event_.value) + " Type: " + std::to_string(event_.type) + " Number: " + std::to_string(event_.number), useCout_);
+		            LogManager::get()->warning("[JOYSTICK] Unknown event type. Time: " + toString(event_.time) + " Value: " + toString(event_.value) + " Type: " + toString(event_.type) + " Number: " + toString(event_.number), useCout_);
 					break;
 			}
 		}
@@ -260,8 +261,7 @@ namespace joystick{
 			close(joy_fd);
 			closedir(dev_dir);
 
-			std::string name = current_joy_name; // TODO: DELETE THIS VARIABLE
-            LogManager::get()->status("[JOYSTICK] Found Joystick: " + name + " in: " + current_path.c_str(), useCout_);
+            LogManager::get()->status("[JOYSTICK] Found Joystick: " + toString(current_joy_name) + " in: " + current_path.c_str(), useCout_);
 
 			return current_path;
 		}
@@ -284,8 +284,7 @@ namespace joystick{
 		auto dev_dir = opendir(path);
 		if (dev_dir == nullptr)
 		{
-			std::string error = strerror(errno);
-            LogManager::get()->error("[JOYSTICK] Couldn't open /dev/input/by-id Error: " + error, useCout_);
+            LogManager::get()->error("[JOYSTICK] Couldn't open /dev/input/by-id Error: " + toString(strerror(errno)), useCout_);
 			return "";
 		}
 
@@ -388,10 +387,7 @@ namespace joystick{
 		ie.value = 0xFFFFUL * gain / 100;
 
 		if (write(ff_, &ie, sizeof(ie)) == -1)
-		{
-			std::string error = strerror(errno);
-			LogManager::get()->warning("[JOYSTICK] Couldn't set gain on joystick force feedback, Error: " + error, useCout_);
-		}
+			LogManager::get()->warning("[JOYSTICK] Couldn't set gain on joystick force feedback, Error: " + toString(strerror(errno)), useCout_);
 
 		memset(&joyEffect_, 0, sizeof(joyEffect_));
 		joyEffect_.id = -1;

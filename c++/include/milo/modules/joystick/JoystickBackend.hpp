@@ -49,6 +49,7 @@
 #include <sstream>
 #include <fstream>
 
+#include <milo/modules/utils/conversions.hpp>
 #include "milo/modules/logger/LogManager.hpp"
 
 namespace milo{

@@ -20,61 +20,37 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-// Those class are based in: https://github.com/clydemcqueen/tello_ros/blob/master/tello_driver/
+#ifndef __MILO_MODULES_UTILS_CONVERSIONS_H__
+#define __MILO_MODULES_UTILS_CONVERSIONS_H__ 1
 
-#ifndef __MILO_MODULES_SOCKET_TELLO_H__
-#define __MILO_MODULES_SOCKET_TELLO_H__ 1
-
-#include <atomic>
-#include <thread>
-#include <mutex>
-#include <chrono>
-#include <iostream>
-
-#include <boost/array.hpp>
-#include <boost/asio.hpp>
-
-#include <milo/modules/utils/conversions.hpp>
-#include "milo/modules/logger/LogManager.hpp"
+#include <map>
+#include <math.h>
+#include <string>
 
 namespace milo{
 namespace modules{
-namespace socket{
+namespace utils{
 
-    class TelloSocket
+    template<typename T>
+    inline std::string toString(const T &_value)
     {
-        public:
-            bool close();
+        std::stringstream ss;
+        ss << _value;
+        return ss.str();
+    }
 
-            bool receiving();
+    inline double radToDeg(double _value)
+    {
+        return (_value * 180) / M_PI;
+    }
 
-            virtual void timeout();
-
-        protected:
-            bool create(int _port);
-
-            void listen();
-
-            virtual void process_packet(size_t r) = 0;
-
-        protected:
-            boost::asio::io_service ioService_;         
-            boost::asio::ip::udp::socket *socket_ = nullptr;            
-
-            std::thread thread_;                  
-            std::mutex mtx_;               
-
-            std::atomic<bool> useCout_ = false;
-            
-            std::atomic<bool> run_ = false;
-            std::atomic<bool> receiving_ = false;              
-            std::chrono::high_resolution_clock::time_point receiveTime_;           
-            std::vector<unsigned char> buffer_;   
-
-    };
+    inline double degToRad(double _value)
+    {
+        return (_value * M_PI) / 180;
+    }
 
 }
-} 
+}
 }
 
 #endif
