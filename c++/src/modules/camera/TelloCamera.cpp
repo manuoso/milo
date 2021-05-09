@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#include "milo/modules/camera/TelloCamera.h"
+#include "milo/modules/camera/TelloCamera.hpp"
 
 namespace milo{
 namespace modules{

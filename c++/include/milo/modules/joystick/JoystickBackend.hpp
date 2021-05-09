@@ -20,80 +20,83 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#ifndef __MILO_MODULES_TELEMETRY_TELLO_TELEMETRY_H__
-#define __MILO_MODULES_TELEMETRY_TELLO_TELEMETRY_H__ 1
+#ifndef __MILO_MODULES_JOYSTICK_BACKEND_H__
+#define __MILO_MODULES_JOYSTICK_BACKEND_H__ 1
+
+#include <linux/input.h>
+#include <linux/joystick.h>
+
+#include <atomic>
+
+#include <memory>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <dirent.h>
+#include <sys/stat.h>
 
 #include <string>
+#include <cstring>
+#include <cstdlib>
 
-#include "milo/modules/logger/LogManager.h"
+#include <vector>
+#include <cmath>
+#include <algorithm>
 
-#include "milo/modules/telemetry/driver/StateSocket.h"
+#include <limits.h>
+#include <unistd.h>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+
+#include "milo/modules/logger/LogManager.hpp"
 
 namespace milo{
 namespace modules{
-namespace telemetry{
+namespace joystick{
 
-    class TelloTelemetry
+    class JoystickBackend
     {
         public:
-            // Example: “pitch:%d;roll:%d;yaw:%d;vgx:%d;vgy%d;vgz:%d;templ:%d;temph:%d;tof:%d;h:%d;bat:%d;baro:%.2f; time:%d;agx:%.2f;agy:%.2f;agz:%.2f;\r\n”
-            struct TelemetryData{
-                int pitch = 0;
-                int roll = 0;
-                int yaw = 0;
-                int vx = 0;
-                int vy = 0;
-                int vz = 0;
-                // int templ = 0;
-                // int temph = 0;
-                int tof = 0;
-                int h = 0;
-                int bat = 0;
-                // float baro = 0;
-                int time = 0;
-                float ax = 0;
-                float ay = 0;
-                float az = 0;
-            };
+            JoystickBackend(bool _useCout);
+            JoystickBackend(bool _useCout, const std::string &_name);
 
-        public:
-            TelloTelemetry(bool _useCout, int _port);
+            ~JoystickBackend();
 
-            ~TelloTelemetry();
+            bool isInit();
+            bool closeJoy();
+            
+            int getAxisCount();
+            int getButtonsCount();
 
-            bool isReceiving();
+            void setDeadzone(double _deadzone);
+            bool setFeedback(struct ff_effect _effect);
+            bool setCorrection(std::vector<int> _type, std::vector<int> _prec, std::vector<int> _coef);
 
-            void timeout();
+            bool readJoy(std::string &_eventType, int &_eventNumber, double &_value);
+        
+        private:
+            std::string identifyJoy();
 
-            TelemetryData getAllTelemetry();
+            std::string identifyFF(const std::string &_name);
 
-            std::vector<int> getRPY();
-
-            std::vector<int> getVelocity();
-
-            int getTOF();
-
-            int getHeight();
-
-            int getBattery();
-
-            int getTimeOfFlight();
-
-            std::vector<float> getAcceleration();
+            bool openJoy(const std::string &_joy, const std::string &_ff);
 
         private:
-            void decodeThread();
+            std::atomic<bool> init_;
+            std::atomic<bool> useCout_;
+            int fd_, ff_;
+            int axisCount_, buttonCount_;
 
-            void decodeData(std::map<std::string, std::string> _data);
+            struct ff_effect joyEffect_;
+            fd_set set_;
+            js_event event_;
 
-        private:
-            driver::StateSocket *stateSocket_ = nullptr;
-            TelemetryData data_;
+            std::atomic<bool> updateEffect_;
 
-            std::thread thread_;                  
-            std::mutex mtx_;    
-            bool run_;
-            bool useCout_;
+            double deadzone_;
+            double scale_;
+            double unscaledDeadzone_;
 
     };
 

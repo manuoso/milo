@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#include "milo/modules/telemetry/driver/StateSocket.h"
+#include "milo/modules/telemetry/driver/StateSocket.hpp"
 
 namespace milo{
 namespace modules{

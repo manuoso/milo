@@ -22,8 +22,8 @@
 
 #include <signal.h>
 
-#include "milo/milo.h"
-#include "milo/modules/joystick/JoystickBackend.h"
+#include "milo/milo.hpp"
+#include "milo/modules/joystick/JoystickBackend.hpp"
 
 using namespace milo;
 using namespace milo::modules::joystick;

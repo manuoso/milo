@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#include "milo/modules/telemetry/TelloTelemetry.h"
+#include "milo/modules/telemetry/TelloTelemetry.hpp"
 
 namespace milo{
 namespace modules{

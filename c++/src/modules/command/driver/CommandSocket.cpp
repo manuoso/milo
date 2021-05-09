@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#include "milo/modules/command/driver/CommandSocket.h"
+#include "milo/modules/command/driver/CommandSocket.hpp"
 
 namespace milo{
 namespace modules{

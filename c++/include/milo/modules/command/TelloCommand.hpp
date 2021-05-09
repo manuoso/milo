@@ -20,54 +20,62 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-// Those class are based in: https://github.com/clydemcqueen/tello_ros/blob/master/tello_driver/
+#ifndef __MILO_MODULES_COMMAND_TELLO_COMMAND_H__
+#define __MILO_MODULES_COMMAND_TELLO_COMMAND_H__ 1
 
-#ifndef __MILO_MODULES_COMMAND_DRIVER_H__
-#define __MILO_MODULES_COMMAND_DRIVER_H__ 1
-
-#include "milo/modules/logger/LogManager.h"
-
-#include "milo/modules/socket/TelloSocket.h"
+#include "milo/modules/command/driver/CommandSocket.hpp"
 
 namespace milo{
 namespace modules{
 namespace command{
-namespace driver{
 
-    class CommandSocket : public socket::TelloSocket
+    class TelloCommand
     {
         public:
-            CommandSocket(bool _useCout, std::string _ip, int _port);
+            TelloCommand(bool _useCout, std::string _ip, int _port);
 
-            virtual ~CommandSocket();
+            ~TelloCommand();
 
             bool isInit();
+
+            bool isReceiving();
+
+            bool isWaiting();
+
+            bool isRespond();
+
+            void timeout();
+
+            float timeSendRecv();
+
+            float timeFromLastRecv();
+
+            void setControl();
+
+            void setCamera(bool _enable);
+
+            void takeoff();
+
+            void land();
             
-            void timeout() override;
+            void emergency();
 
-            bool waiting();
+            void rc_control(int _roll, int _pitch, int _throttle, int _yaw);
 
-            bool respond();
+            void move(std::string _dir, int _dist);
 
-            std::chrono::high_resolution_clock::time_point receive_time();
-
-            std::chrono::high_resolution_clock::time_point send_time();
+            void rotate(std::string _dir, int _angle);
 
             void send(std::string _cmd);
 
         private:
-            void process_packet(size_t r) override;
+            driver::CommandSocket *commandSocket_ = nullptr;
 
-        private:
-            boost::asio::ip::udp::endpoint remotEndpoint_;
-
-            std::chrono::high_resolution_clock::time_point sendTime_;  
-            bool waiting_;    
-            bool respond_;
+            std::atomic<bool> useCout_;
+            std::mutex mtx_;    
 
     };
 
-}
 }
 }
 }

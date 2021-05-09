@@ -23,6 +23,7 @@
 #ifndef MILO_NODE_H_
 #define MILO_NODE_H_
 
+#include <atomic>
 #include <signal.h>
 
 #include <ros/ros.h>
@@ -97,7 +98,7 @@ class MiloNode
         ros::Subscriber rcSub_;
         ros::ServiceServer landSrv_, takeoffSrv_, emergencySrv_;
 
-        bool fin_;
+        std::atomic<bool> fin_;
 
 };
 

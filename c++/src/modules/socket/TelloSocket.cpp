@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#include "milo/modules/socket/TelloSocket.h"
+#include "milo/modules/socket/TelloSocket.hpp"
 
 namespace milo{
 namespace modules{

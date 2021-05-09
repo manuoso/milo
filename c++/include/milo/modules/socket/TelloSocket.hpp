@@ -25,6 +25,7 @@
 #ifndef __MILO_MODULES_SOCKET_TELLO_H__
 #define __MILO_MODULES_SOCKET_TELLO_H__ 1
 
+#include <atomic>
 #include <thread>
 #include <mutex>
 #include <chrono>
@@ -33,7 +34,7 @@
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
 
-#include "milo/modules/logger/LogManager.h"
+#include "milo/modules/logger/LogManager.hpp"
 
 namespace milo{
 namespace modules{
@@ -62,10 +63,10 @@ namespace socket{
             std::thread thread_;                  
             std::mutex mtx_;               
 
-            bool useCout_ = false;
+            std::atomic<bool> useCout_ = false;
             
-            bool run_ = false;
-            bool receiving_ = false;              
+            std::atomic<bool> run_ = false;
+            std::atomic<bool> receiving_ = false;              
             std::chrono::high_resolution_clock::time_point receiveTime_;           
             std::vector<unsigned char> buffer_;   
 

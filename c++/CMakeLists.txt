@@ -53,7 +53,7 @@ find_package(OpenCV REQUIRED)
 # Look for <linux/joystick.h>
 include(CheckIncludeFiles)
 check_include_files(linux/joystick.h HAVE_LINUX_JOYSTICK_H)
-if(HAVE_LINUX_JOYSTICK_H)
+if(${HAVE_LINUX_JOYSTICK_H})
 	file(GLOB_RECURSE JOY_SOURCE_FILES "src/modules/joystick/*.c" "src/modules/joystick/*.cpp")
 	file(GLOB_RECURSE JOY_HEADER_FILES "include/milo/modules/joystick/*.h" "include/milo/modules/joystick/*.hpp" "include/milo/modules/joystick/*.inl")
 else()

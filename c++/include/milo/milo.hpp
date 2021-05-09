@@ -23,11 +23,13 @@
 #ifndef MILO_H_
 #define MILO_H_
 
-#include "milo/modules/logger/LogManager.h"
+#include <atomic>
 
-#include "milo/modules/command/TelloCommand.h"
-#include "milo/modules/telemetry/TelloTelemetry.h"
-#include "milo/modules/camera/TelloCamera.h"
+#include "milo/modules/logger/LogManager.hpp"
+
+#include "milo/modules/command/TelloCommand.hpp"
+#include "milo/modules/telemetry/TelloTelemetry.hpp"
+#include "milo/modules/camera/TelloCamera.hpp"
 
 namespace milo{
     using namespace modules::command;
@@ -84,8 +86,8 @@ namespace milo{
             TelloTelemetry *telemetry_ = nullptr;
             TelloCamera *camera_ = nullptr;
 
-            bool run_;
-            bool useCout_;
+            std::atomic<bool> run_;
+            std::atomic<bool> useCout_;
             std::thread thread_;                  
 
     };

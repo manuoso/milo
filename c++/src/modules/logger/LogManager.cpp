@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#include "milo/modules/logger/LogManager.h"
+#include "milo/modules/logger/LogManager.hpp"
 
 using namespace std;
 

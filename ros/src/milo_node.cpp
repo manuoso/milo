@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#include "milo_node.h"
+#include "milo_node.hpp"
 
 using namespace milo::modules::logger;
 

@@ -20,84 +20,51 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#ifndef __MILO_MODULES_JOYSTICK_BACKEND_H__
-#define __MILO_MODULES_JOYSTICK_BACKEND_H__ 1
+// Those class are based in: https://github.com/clydemcqueen/tello_ros/blob/master/tello_driver/
 
-#include <linux/input.h>
-#include <linux/joystick.h>
+#ifndef __MILO_MODULES_CAMERA_DRIVER_H__
+#define __MILO_MODULES_CAMERA_DRIVER_H__ 1
 
-#include <memory>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <fcntl.h>
-#include <dirent.h>
-#include <sys/stat.h>
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui.hpp>
 
-#include <string>
-#include <cstring>
-#include <cstdlib>
+#include <libavutil/frame.h>
 
-#include <vector>
-#include <cmath>
-#include <algorithm>
-
-#include <limits.h>
-#include <unistd.h>
-#include <iostream>
-#include <sstream>
-#include <fstream>
-
-#include "milo/modules/logger/LogManager.h"
+#include "milo/modules/socket/TelloSocket.hpp"
+#include "milo/modules/camera/decoder/h264decoder.hpp"
 
 namespace milo{
 namespace modules{
-namespace joystick{
-
-    class JoystickBackend
+namespace camera{
+namespace driver{
+    
+    class CameraSocket : public socket::TelloSocket
     {
         public:
-            JoystickBackend(bool _useCout);
-            JoystickBackend(bool _useCout, const std::string &_name);
+            CameraSocket(bool _useCout, int _port);
 
-            ~JoystickBackend();
+            virtual ~CameraSocket();
 
-            bool isInit();
-            bool closeJoy();
-            
-            int getAxisCount();
-            int getButtonsCount();
-
-            void setDeadzone(double _deadzone);
-            bool setFeedback(struct ff_effect _effect);
-            bool setCorrection(std::vector<int> _type, std::vector<int> _prec, std::vector<int> _coef);
-
-            bool readJoy(std::string &_eventType, int &_eventNumber, double &_value);
-        
-        private:
-            std::string identifyJoy();
-
-            std::string identifyFF(const std::string &_name);
-
-            bool openJoy(const std::string &_joy, const std::string &_ff);
+            cv::Mat getFrame();
 
         private:
-            bool init_;
-            bool useCout_;
-            int fd_, ff_;
-            int axisCount_, buttonCount_;
+            void process_packet(size_t r) override;
 
-            struct ff_effect joyEffect_;
-            fd_set set_;
-            js_event event_;
+            void decode_frames();
 
-            bool updateEffect_;
+        private:
+            std::vector<unsigned char> seq_buffer_; 
+            size_t seq_buffer_next_;
+            int seq_buffer_num_packets_;          
 
-            double deadzone_;
-            double scale_;
-            double unscaledDeadzone_;
+            H264Decoder decoder_;
+            ConverterRGB24 converter_;
+
+            cv::Mat frameDecoded_;
 
     };
 
+}
 }
 }
 }

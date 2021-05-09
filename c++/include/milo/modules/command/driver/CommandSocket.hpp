@@ -20,38 +20,52 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#ifndef __MILO_MODULES_CAMERA_TELLO_CAMERA_H__
-#define __MILO_MODULES_CAMERA_TELLO_CAMERA_H__ 1
+// Those class are based in: https://github.com/clydemcqueen/tello_ros/blob/master/tello_driver/
 
-#include "milo/modules/logger/LogManager.h"
+#ifndef __MILO_MODULES_COMMAND_DRIVER_H__
+#define __MILO_MODULES_COMMAND_DRIVER_H__ 1
 
-#include "milo/modules/camera/driver/CameraSocket.h"
+#include "milo/modules/socket/TelloSocket.hpp"
 
 namespace milo{
 namespace modules{
-namespace camera{
-    
-    class TelloCamera
+namespace command{
+namespace driver{
+
+    class CommandSocket : public socket::TelloSocket
     {
         public:
-            TelloCamera(bool _useCout, int _port);
+            CommandSocket(bool _useCout, std::string _ip, int _port);
 
-            ~TelloCamera();
+            virtual ~CommandSocket();
 
-            bool isReceiving();
+            bool isInit();
+            
+            void timeout() override;
 
-            void timeout();
+            bool waiting();
 
-            cv::Mat getImage();
+            bool respond();
+
+            std::chrono::high_resolution_clock::time_point receive_time();
+
+            std::chrono::high_resolution_clock::time_point send_time();
+
+            void send(std::string _cmd);
 
         private:
-            driver::CameraSocket *cameraSocket_ = nullptr;
+            void process_packet(size_t r) override;
 
-            bool useCout_;
-            std::mutex mtx_;    
+        private:
+            boost::asio::ip::udp::endpoint remotEndpoint_;
+
+            std::chrono::high_resolution_clock::time_point sendTime_;  
+            std::atomic<bool> waiting_;    
+            std::atomic<bool> respond_;
 
     };
 
+}
 }
 }
 }

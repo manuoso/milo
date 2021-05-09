@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#include "milo/modules/camera/driver/CameraSocket.h"
+#include "milo/modules/camera/driver/CameraSocket.hpp"
 
 namespace milo{
 namespace modules{

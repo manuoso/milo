@@ -20,60 +20,32 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#ifndef __MILO_MODULES_COMMAND_TELLO_COMMAND_H__
-#define __MILO_MODULES_COMMAND_TELLO_COMMAND_H__ 1
+#ifndef __MILO_MODULES_CAMERA_TELLO_CAMERA_H__
+#define __MILO_MODULES_CAMERA_TELLO_CAMERA_H__ 1
 
-#include "milo/modules/logger/LogManager.h"
-
-#include "milo/modules/command/driver/CommandSocket.h"
+#include "milo/modules/camera/driver/CameraSocket.hpp"
 
 namespace milo{
 namespace modules{
-namespace command{
-
-    class TelloCommand
+namespace camera{
+    
+    class TelloCamera
     {
         public:
-            TelloCommand(bool _useCout, std::string _ip, int _port);
+            TelloCamera(bool _useCout, int _port);
 
-            ~TelloCommand();
-
-            bool isInit();
+            ~TelloCamera();
 
             bool isReceiving();
 
-            bool isWaiting();
-
-            bool isRespond();
-
             void timeout();
 
-            float timeSendRecv();
-
-            float timeFromLastRecv();
-
-            void setControl();
-
-            void setCamera(bool _enable);
-
-            void takeoff();
-
-            void land();
-            
-            void emergency();
-
-            void rc_control(int _roll, int _pitch, int _throttle, int _yaw);
-
-            void move(std::string _dir, int _dist);
-
-            void rotate(std::string _dir, int _angle);
-
-            void send(std::string _cmd);
+            cv::Mat getImage();
 
         private:
-            driver::CommandSocket *commandSocket_ = nullptr;
+            driver::CameraSocket *cameraSocket_ = nullptr;
 
-            bool useCout_;
+            std::atomic<bool> useCout_;
             std::mutex mtx_;    
 
     };

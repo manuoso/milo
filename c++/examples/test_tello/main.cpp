@@ -24,7 +24,7 @@
 #include <thread>
 #include <chrono>
 
-#include "milo/milo.h"
+#include "milo/milo.hpp"
 
 using namespace milo;
 

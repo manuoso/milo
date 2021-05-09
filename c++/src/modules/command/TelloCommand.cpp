@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#include "milo/modules/command/TelloCommand.h"
+#include "milo/modules/command/TelloCommand.hpp"
 
 namespace milo{
 namespace modules{

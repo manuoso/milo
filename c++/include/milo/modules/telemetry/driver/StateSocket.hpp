@@ -22,47 +22,32 @@
 
 // Those class are based in: https://github.com/clydemcqueen/tello_ros/blob/master/tello_driver/
 
-#ifndef __MILO_MODULES_CAMERA_DRIVER_H__
-#define __MILO_MODULES_CAMERA_DRIVER_H__ 1
+#ifndef __MILO_MODULES_TELEMETRY_DRIVER_H__
+#define __MILO_MODULES_TELEMETRY_DRIVER_H__ 1
 
-#include <opencv2/opencv.hpp>
-#include <opencv2/highgui.hpp>
+#include <regex>
 
-#include <libavutil/frame.h>
-
-#include "milo/modules/logger/LogManager.h"
-
-#include "milo/modules/socket/TelloSocket.h"
-#include "milo/modules/camera/decoder/h264decoder.hpp"
+#include "milo/modules/socket/TelloSocket.hpp"
 
 namespace milo{
 namespace modules{
-namespace camera{
+namespace telemetry{
 namespace driver{
-    
-    class CameraSocket : public socket::TelloSocket
+
+    class StateSocket : public socket::TelloSocket
     {
         public:
-            CameraSocket(bool _useCout, int _port);
+            StateSocket(bool _useCout, int _port);
 
-            virtual ~CameraSocket();
+            virtual ~StateSocket();
 
-            cv::Mat getFrame();
+            std::map<std::string, std::string> getDecodedData();
 
         private:
             void process_packet(size_t r) override;
 
-            void decode_frames();
-
         private:
-            std::vector<unsigned char> seq_buffer_; 
-            size_t seq_buffer_next_;
-            int seq_buffer_num_packets_;          
-
-            H264Decoder decoder_;
-            ConverterRGB24 converter_;
-
-            cv::Mat frameDecoded_;
+            std::map<std::string, std::string> decodedData_;
 
     };
 

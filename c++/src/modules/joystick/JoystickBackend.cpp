@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#include "milo/modules/joystick/JoystickBackend.h"
+#include "milo/modules/joystick/JoystickBackend.hpp"
 
 namespace milo{
 namespace modules{
