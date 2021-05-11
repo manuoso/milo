@@ -20,6 +20,9 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
+#ifdef HAS_BOOST
+#ifdef HAS_OPENCV
+
 #include "milo/modules/camera/TelloCamera.hpp"
 
 namespace milo{
@@ -69,3 +72,6 @@ namespace camera{
 }
 }
 }
+
+#endif
+#endif

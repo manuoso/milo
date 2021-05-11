@@ -20,6 +20,9 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
+#ifdef HAS_BOOST
+#ifdef HAS_OPENCV
+
 #include "milo/modules/camera/driver/CameraSocket.hpp"
 
 namespace milo{
@@ -149,3 +152,6 @@ namespace driver{
 }
 }
 }
+
+#endif
+#endif

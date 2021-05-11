@@ -20,6 +20,8 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
+#ifdef HAS_BOOST
+
 #include "milo/modules/command/driver/CommandSocket.hpp"
 
 namespace milo{
@@ -142,3 +144,5 @@ namespace driver{
 }
 }
 }
+
+#endif

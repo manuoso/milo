@@ -1,3 +1,6 @@
+#ifdef HAS_BOOST
+#ifdef HAS_OPENCV
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavutil/avutil.h>
@@ -170,3 +173,6 @@ void disable_logging()
 {
     av_log_set_level(AV_LOG_QUIET);
 }
+
+#endif
+#endif

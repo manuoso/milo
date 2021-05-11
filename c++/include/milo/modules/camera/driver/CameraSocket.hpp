@@ -25,6 +25,9 @@
 #ifndef __MILO_MODULES_CAMERA_DRIVER_H__
 #define __MILO_MODULES_CAMERA_DRIVER_H__ 1
 
+#ifdef HAS_BOOST
+#ifdef HAS_OPENCV
+
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui.hpp>
 
@@ -68,5 +71,8 @@ namespace driver{
 }
 }
 }
+
+#endif
+#endif
 
 #endif

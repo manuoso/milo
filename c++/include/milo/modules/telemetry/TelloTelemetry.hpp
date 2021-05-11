@@ -23,6 +23,8 @@
 #ifndef __MILO_MODULES_TELEMETRY_TELLO_TELEMETRY_H__
 #define __MILO_MODULES_TELEMETRY_TELLO_TELEMETRY_H__ 1
 
+#ifdef HAS_BOOST
+
 #include <string>
 
 #include "milo/modules/telemetry/driver/StateSocket.hpp"
@@ -98,5 +100,7 @@ namespace telemetry{
 }
 }
 }
+
+#endif
 
 #endif

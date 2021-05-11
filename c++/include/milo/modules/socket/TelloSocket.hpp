@@ -25,6 +25,8 @@
 #ifndef __MILO_MODULES_SOCKET_TELLO_H__
 #define __MILO_MODULES_SOCKET_TELLO_H__ 1
 
+#ifdef HAS_BOOST
+
 #include <atomic>
 #include <thread>
 #include <mutex>
@@ -76,5 +78,7 @@ namespace socket{
 }
 } 
 }
+
+#endif
 
 #endif

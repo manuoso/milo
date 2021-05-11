@@ -20,6 +20,8 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
+#ifdef HAS_BOOST
+
 #include "milo/modules/socket/TelloSocket.hpp"
 
 namespace milo{
@@ -100,3 +102,5 @@ namespace socket{
 }
 }
 }
+
+#endif

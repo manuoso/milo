@@ -23,6 +23,8 @@
 #ifndef __MILO_MODULES_COMMAND_TELLO_COMMAND_H__
 #define __MILO_MODULES_COMMAND_TELLO_COMMAND_H__ 1
 
+#ifdef HAS_BOOST
+
 #include "milo/modules/command/driver/CommandSocket.hpp"
 
 namespace milo{
@@ -79,5 +81,7 @@ namespace command{
 }
 }
 }
+
+#endif
 
 #endif

@@ -16,6 +16,9 @@ conveniently forwarded to python via the exception translation
 mechanisms of boost::python.  
 */
 
+#ifdef HAS_BOOST
+#ifdef HAS_OPENCV 
+
 // for ssize_t (signed int type as large as pointer type)
 #include <cstdlib>
 #include <stdexcept>
@@ -107,6 +110,9 @@ void disable_logging();
 /* Wrappers, so we don't have to include libav headers. */
 std::pair<int, int> width_height(const AVFrame&);
 int row_size(const AVFrame&);
+
+#endif
+#endif
 
 /* all the documentation links
  * My version of libav on ubuntu 16 appears to be from the release/11 branch on github

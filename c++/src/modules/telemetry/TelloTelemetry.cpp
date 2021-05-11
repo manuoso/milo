@@ -20,6 +20,8 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
+#ifdef HAS_BOOST
+
 #include "milo/modules/telemetry/TelloTelemetry.hpp"
 
 namespace milo{
@@ -175,3 +177,5 @@ namespace telemetry{
 }
 }
 }
+
+#endif

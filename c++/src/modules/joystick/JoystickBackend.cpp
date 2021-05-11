@@ -20,6 +20,8 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
+#ifdef HAS_JOY
+
 #include "milo/modules/joystick/JoystickBackend.hpp"
 
 namespace milo{
@@ -412,3 +414,5 @@ namespace joystick{
 }
 }
 }
+
+#endif

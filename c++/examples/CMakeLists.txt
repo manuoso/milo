@@ -27,7 +27,9 @@ macro(build_example example_name example_files)
 	target_link_libraries(${example_name} LINK_PUBLIC milo)
 endmacro()
 
-build_example(test_tello test_tello/main.cpp)
+if(${Boost_FOUND} AND ${OpenCV_FOUND})
+	build_example(test_tello test_tello/main.cpp)
+endif()
 
 if(${HAVE_LINUX_JOYSTICK_H})
 	build_example(test_joystick test_joystick/main.cpp)

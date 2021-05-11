@@ -20,6 +20,8 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
+#ifdef HAS_BOOST
+
 #include "milo/modules/command/TelloCommand.hpp"
 
 namespace milo{
@@ -166,3 +168,5 @@ namespace command{
 }
 }
 }
+
+#endif

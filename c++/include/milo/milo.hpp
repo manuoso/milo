@@ -23,18 +23,27 @@
 #ifndef MILO_H_
 #define MILO_H_
 
+#include <thread>
 #include <atomic>
 
 #include "milo/modules/logger/LogManager.hpp"
 
-#include "milo/modules/command/TelloCommand.hpp"
+#ifdef HAS_BOOST
 #include "milo/modules/telemetry/TelloTelemetry.hpp"
+#include "milo/modules/command/TelloCommand.hpp"
+#ifdef HAS_OPENCV
 #include "milo/modules/camera/TelloCamera.hpp"
+#endif
+#endif
 
 namespace milo{
+#ifdef HAS_BOOST 
     using namespace modules::command;
     using namespace modules::telemetry;
+#ifdef HAS_OPENCV
     using namespace modules::camera;
+#endif
+#endif
 
     using namespace milo::modules::logger;
 
@@ -56,11 +65,14 @@ namespace milo{
             // MODULES
 	        //---------------------------------------------------------------------------------------------------------------------
 
+#ifdef HAS_BOOST 
             TelloCommand * command(){return command_;}
 
             TelloTelemetry * telemetry(){return telemetry_;}
-
+#ifdef HAS_OPENCV
             TelloCamera * camera(){return camera_;}
+#endif
+#endif
 
             //---------------------------------------------------------------------------------------------------------------------
             // UTILS
@@ -77,14 +89,20 @@ namespace milo{
             /// Destructor
             virtual ~MILO(); 
 
+#ifdef HAS_BOOST 
             void timeoutThread();
+#endif
 
         private:
 		    static MILO *milo_;
 
+#ifdef HAS_BOOST 
             TelloCommand *command_ = nullptr;
             TelloTelemetry *telemetry_ = nullptr;
+#ifdef HAS_OPENCV
             TelloCamera *camera_ = nullptr;
+#endif
+#endif
 
             std::atomic<bool> run_;
             std::atomic<bool> useCout_;

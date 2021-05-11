@@ -25,6 +25,8 @@
 #ifndef __MILO_MODULES_COMMAND_DRIVER_H__
 #define __MILO_MODULES_COMMAND_DRIVER_H__ 1
 
+#ifdef HAS_BOOST
+
 #include "milo/modules/socket/TelloSocket.hpp"
 
 namespace milo{
@@ -69,5 +71,7 @@ namespace driver{
 }
 }
 }
+
+#endif
 
 #endif

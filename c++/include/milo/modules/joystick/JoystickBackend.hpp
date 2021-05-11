@@ -23,6 +23,8 @@
 #ifndef __MILO_MODULES_JOYSTICK_BACKEND_H__
 #define __MILO_MODULES_JOYSTICK_BACKEND_H__ 1
 
+#ifdef HAS_JOY
+
 #include <linux/input.h>
 #include <linux/joystick.h>
 
@@ -104,5 +106,7 @@ namespace joystick{
 }
 }
 }
+
+#endif
 
 #endif
