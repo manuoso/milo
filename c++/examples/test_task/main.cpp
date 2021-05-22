@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 //  MILO
 //---------------------------------------------------------------------------------------------------------------------
-//  Copyright 2021 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
+//  Copyright 2020 Manuel Pérez Jiménez (a.k.a. manuoso) manuperezj@gmail.com
 //---------------------------------------------------------------------------------------------------------------------
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 //  and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -20,55 +20,61 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-// Those class are based in: https://github.com/clydemcqueen/tello_ros/blob/master/tello_driver/
+#include <signal.h>
 
-#pragma once
+#include "milo/milo.hpp"
+#include "milo/modules/utils/task.hpp"
 
-#ifdef HAS_BOOST
+using namespace milo::modules::utils;
+using namespace std::chrono;
 
-#include "milo/modules/socket/TelloSocket.hpp"
+class TaskTest : public Task
+{
+    public:
+        TaskTest(unsigned int _duration) : Task(_duration)
+        { 
+            start_ = high_resolution_clock::now(); 
+            this->run();
+        }
+        
+        ~TaskTest(){ }
 
-namespace milo{
-namespace modules{
-namespace command{
-namespace driver{
+        void step()
+        {
+            auto end = high_resolution_clock::now();
+		    auto delay = duration_cast<milliseconds>(end - start_);
 
-    class CommandSocket : public socket::TelloSocket
+            std::cout << "Holi each :" << delay.count() << std::endl;
+
+            start_ = high_resolution_clock::now();
+        }
+    private:
+        high_resolution_clock::time_point start_;
+
+};
+
+bool fin = false;
+
+// Replacement handler
+void finishHandler(int _sig)
+{
+    std::cout << "Finish Handler: Catch signal " << _sig << std::endl;
+    fin = true;
+}
+
+int main(int _argc, char **_argv)
+{
+    signal(SIGINT, finishHandler);
+    signal(SIGTERM, finishHandler);
+
+    TaskTest tt(1000);
+
+    while (!fin)
     {
-        public:
-            CommandSocket(bool _useCout, std::string _ip, int _port);
+        sleep(1);
+    }
 
-            virtual ~CommandSocket();
-
-            bool isInit();
-            
-            void timeout() override;
-
-            bool waiting();
-
-            bool respond();
-
-            std::chrono::high_resolution_clock::time_point receive_time();
-
-            std::chrono::high_resolution_clock::time_point send_time();
-
-            void send(std::string _cmd);
-
-        private:
-            void process_packet(size_t r) override;
-
-        private:
-            boost::asio::ip::udp::endpoint remotEndpoint_;
-
-            std::chrono::high_resolution_clock::time_point sendTime_;  
-            std::atomic<bool> waiting_;    
-            std::atomic<bool> respond_;
-
-    };
-
+    tt.stop();
+    
+    return 0;
 }
-}
-}
-}
-
-#endif

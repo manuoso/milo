@@ -78,11 +78,10 @@ namespace milo{
     //---------------------------------------------------------------------------------------------------------------------
     MILO::MILO(bool _useCout, bool _initState, bool _initCamera) 
     {
-        useCout_ = _useCout;
         LogManager::init("log");
 
 #ifdef HAS_BOOST 
-        command_ = new TelloCommand(useCout_, "192.168.10.1", 8889);
+        command_ = new TelloCommand(_useCout, "192.168.10.1", 8889);
 
         if (command_->isInit())
             timeoutThread();
@@ -90,11 +89,11 @@ namespace milo{
             command_ = nullptr;
 
         if (_initState && command_ != nullptr)
-            telemetry_ = new TelloTelemetry(useCout_, 8890);
+            telemetry_ = new TelloTelemetry(_useCout, 8890);
 
 #ifdef HAS_OPENCV 
         if (_initCamera && command_ != nullptr)
-            camera_ = new TelloCamera(useCout_, 11111);
+            camera_ = new TelloCamera(_useCout, 11111);
 #endif
 #endif
     }
@@ -102,7 +101,7 @@ namespace milo{
     //---------------------------------------------------------------------------------------------------------------------
     MILO::~MILO() 
     {
-        run_ = false;
+        run_.store(false);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 #ifdef HAS_BOOST         
@@ -121,11 +120,11 @@ namespace milo{
 #ifdef HAS_BOOST 
     void MILO::timeoutThread()
     {
-        run_ = true;
+        run_.store(true);
         thread_ = std::thread(
         [&]()
         {
-            while (run_)
+            while (run_.load())
             {
                 float diff = command_->timeFromLastRecv();
 

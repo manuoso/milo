@@ -20,8 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#ifndef __MILO_MODULES_TELEMETRY_TELLO_TELEMETRY_H__
-#define __MILO_MODULES_TELEMETRY_TELLO_TELEMETRY_H__ 1
+#pragma once
 
 #ifdef HAS_BOOST
 
@@ -100,7 +99,5 @@ namespace telemetry{
 }
 }
 }
-
-#endif
 
 #endif

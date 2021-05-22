@@ -33,12 +33,12 @@ namespace command{
     //---------------------------------------------------------------------------------------------------------------------
     TelloCommand::TelloCommand(bool _useCout, std::string _ip, int _port)
     {   
-        useCout_ = _useCout;
-        commandSocket_ = new driver::CommandSocket(useCout_, _ip, _port);
+        useCout_.store(_useCout);
+        commandSocket_ = new driver::CommandSocket(useCout_.load(), _ip, _port);
         if (commandSocket_ != nullptr)
-            LogManager::get()->status("[TELLO_COMMAND] Init Command Socket", useCout_);
+            LogManager::get()->status("[TELLO_COMMAND] Init Command Socket", useCout_.load());
         else
-            LogManager::get()->error("[TELLO_COMMAND] Not initialize Command Socket", useCout_);
+            LogManager::get()->error("[TELLO_COMMAND] Not initialize Command Socket", useCout_.load());
 
     }
 

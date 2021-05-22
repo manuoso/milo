@@ -20,8 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#ifndef __MILO_MODULES_UTILS_STATE_H__
-#define __MILO_MODULES_UTILS_STATE_H__ 1
+#pragma once
 
 namespace milo{
 namespace modules{
@@ -37,9 +36,9 @@ namespace utils{
                 // Left in blank intentionally
             }
 
-            void setState(StateManager *_state)
+            void setState(StateManager *_sm)
             {
-                this->sm_ = _state;
+                this->sm_ = _sm;
             }
 
             virtual void task() = 0;
@@ -53,7 +52,7 @@ namespace utils{
     {        
         public:
             StateManager(State *_state)
-                :   state_(_state)
+                :   state_(nullptr)
             {
                 this->transitionTo(_state);
             }
@@ -81,5 +80,3 @@ namespace utils{
 }
 }
 }
-
-#endif

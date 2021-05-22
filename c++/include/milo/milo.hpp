@@ -20,8 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#ifndef MILO_H_
-#define MILO_H_
+#pragma once
 
 #include <thread>
 #include <atomic>
@@ -105,10 +104,7 @@ namespace milo{
 #endif
 
             std::atomic<bool> run_;
-            std::atomic<bool> useCout_;
             std::thread thread_;                  
 
     };
 }
-
-#endif

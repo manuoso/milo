@@ -20,8 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#ifndef __MILO_MODULES_CAMERA_TELLO_CAMERA_H__
-#define __MILO_MODULES_CAMERA_TELLO_CAMERA_H__ 1
+#pragma once
 
 #ifdef HAS_BOOST
 #ifdef HAS_OPENCV
@@ -58,6 +57,4 @@ namespace camera{
 }
 
 #endif
-#endif
-
 #endif

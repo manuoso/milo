@@ -64,8 +64,8 @@ namespace logger{
 		
 		if (_useCout)
 		{
-			cout << logLine;
-			cout.flush();
+			std::cout << logLine;
+			std::cout.flush();
 		}
 	}
 

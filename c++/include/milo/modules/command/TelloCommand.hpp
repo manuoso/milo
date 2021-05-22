@@ -20,8 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#ifndef __MILO_MODULES_COMMAND_TELLO_COMMAND_H__
-#define __MILO_MODULES_COMMAND_TELLO_COMMAND_H__ 1
+#pragma once
 
 #ifdef HAS_BOOST
 
@@ -81,7 +80,5 @@ namespace command{
 }
 }
 }
-
-#endif
 
 #endif

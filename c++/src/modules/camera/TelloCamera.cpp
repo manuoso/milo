@@ -34,12 +34,12 @@ namespace camera{
     //---------------------------------------------------------------------------------------------------------------------
     TelloCamera::TelloCamera(bool _useCout, int _port)
     {
-        useCout_ = _useCout;
-        cameraSocket_ = new driver::CameraSocket(useCout_, _port);
+        useCout_.store(_useCout);
+        cameraSocket_ = new driver::CameraSocket(useCout_.load(), _port);
         if (cameraSocket_ != nullptr)
-            LogManager::get()->status("[TELLO_CAMERA] Init Camera Socket", useCout_);
+            LogManager::get()->status("[TELLO_CAMERA] Init Camera Socket", useCout_.load());
         else
-            LogManager::get()->error("[TELLO_CAMERA] Not initialize Camera Socket", useCout_);
+            LogManager::get()->error("[TELLO_CAMERA] Not initialize Camera Socket", useCout_.load());
     }
 
     //---------------------------------------------------------------------------------------------------------------------

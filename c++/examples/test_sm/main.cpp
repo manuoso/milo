@@ -20,55 +20,73 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-// Those class are based in: https://github.com/clydemcqueen/tello_ros/blob/master/tello_driver/
+#include <signal.h>
 
-#pragma once
+#include "milo/milo.hpp"
+#include "milo/modules/utils/state.hpp"
 
-#ifdef HAS_BOOST
+using namespace milo::modules::utils;
 
-#include "milo/modules/socket/TelloSocket.hpp"
+bool fin = false;
 
-namespace milo{
-namespace modules{
-namespace command{
-namespace driver{
+class InitialState : public State
+{
+    public: 
+        void task() override
+        {
+            std::cout << "Holi soy Initial State" << std::endl;
+        }
+};
 
-    class CommandSocket : public socket::TelloSocket
+class OtherState : public State
+{
+    public: 
+        void task() override
+        {
+            std::cout << "Holi soy Other State" << std::endl;
+        }
+};
+
+class AnotherState : public State
+{
+    public: 
+        void task() override
+        {
+            std::cout << "Holi soy Another State" << std::endl;
+        }
+};
+
+// Replacement handler
+void finishHandler(int _sig)
+{
+    std::cout << "Finish Handler: Catch signal " << _sig << std::endl;
+    fin = true;
+}
+
+int main(int _argc, char **_argv)
+{
+    signal(SIGINT, finishHandler);
+    signal(SIGTERM, finishHandler);
+
+    StateManager *sm = new StateManager(new InitialState);
+
+    while (!fin)
     {
-        public:
-            CommandSocket(bool _useCout, std::string _ip, int _port);
+        int choose = 0;
+        std::cout << "Choose the state you want" << std::endl;
+        std::cout << "1 -> OtherState" << std::endl;
+        std::cout << "2-> AnotherState" << std::endl;
+        std::cin >> choose;
 
-            virtual ~CommandSocket();
+        if (choose == 1)
+            sm->transitionTo(new OtherState);
+        
+        if (choose == 2)
+            sm->transitionTo(new AnotherState);
 
-            bool isInit();
-            
-            void timeout() override;
+    }
 
-            bool waiting();
+    delete sm;
 
-            bool respond();
-
-            std::chrono::high_resolution_clock::time_point receive_time();
-
-            std::chrono::high_resolution_clock::time_point send_time();
-
-            void send(std::string _cmd);
-
-        private:
-            void process_packet(size_t r) override;
-
-        private:
-            boost::asio::ip::udp::endpoint remotEndpoint_;
-
-            std::chrono::high_resolution_clock::time_point sendTime_;  
-            std::atomic<bool> waiting_;    
-            std::atomic<bool> respond_;
-
-    };
-
+    return 0;
 }
-}
-}
-}
-
-#endif

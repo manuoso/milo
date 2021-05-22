@@ -20,8 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#ifndef __MILO_MODULES_UTILS_CONVERSIONS_H__
-#define __MILO_MODULES_UTILS_CONVERSIONS_H__ 1
+#pragma once
 
 #include <map>
 #include <math.h>
@@ -52,5 +51,3 @@ namespace utils{
 }
 }
 }
-
-#endif

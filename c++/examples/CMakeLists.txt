@@ -34,3 +34,7 @@ endif()
 if(${HAVE_LINUX_JOYSTICK_H})
 	build_example(test_joystick test_joystick/main.cpp)
 endif()
+
+build_example(test_task test_task/main.cpp)
+build_example(test_sm test_sm/main.cpp)
+

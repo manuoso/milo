@@ -20,8 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#ifndef __MILO_MODULES_JOYSTICK_BACKEND_H__
-#define __MILO_MODULES_JOYSTICK_BACKEND_H__ 1
+#pragma once
 
 #ifdef HAS_JOY
 
@@ -47,7 +46,6 @@
 
 #include <limits.h>
 #include <unistd.h>
-#include <iostream>
 #include <sstream>
 #include <fstream>
 
@@ -106,7 +104,5 @@ namespace joystick{
 }
 }
 }
-
-#endif
 
 #endif

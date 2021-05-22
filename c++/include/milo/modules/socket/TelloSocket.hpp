@@ -22,8 +22,7 @@
 
 // Those class are based in: https://github.com/clydemcqueen/tello_ros/blob/master/tello_driver/
 
-#ifndef __MILO_MODULES_SOCKET_TELLO_H__
-#define __MILO_MODULES_SOCKET_TELLO_H__ 1
+#pragma once
 
 #ifdef HAS_BOOST
 
@@ -31,7 +30,6 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
-#include <iostream>
 
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
@@ -78,7 +76,5 @@ namespace socket{
 }
 } 
 }
-
-#endif
 
 #endif

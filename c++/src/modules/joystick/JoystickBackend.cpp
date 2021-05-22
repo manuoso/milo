@@ -35,7 +35,7 @@ namespace joystick{
 	JoystickBackend::JoystickBackend(bool _useCout) :
 		init_(false), fd_(-1), ff_(-1)
 	{
-		useCout_ = _useCout;
+		useCout_.store(_useCout);
 		auto joyName = identifyJoy();
 		auto ffName = identifyFF(joyName.c_str());
 		init_ = openJoy(joyName, ffName);
@@ -45,7 +45,7 @@ namespace joystick{
 	JoystickBackend::JoystickBackend(bool _useCout, const std::string &_name) :
 			init_(false), fd_(-1), ff_(-1)
 	{
-		useCout_ = _useCout;
+		useCout_.store(_useCout);
 		auto ffName = identifyFF(_name.c_str());
 		init_ = openJoy(_name.c_str(), ffName);
 	}
@@ -165,8 +165,8 @@ namespace joystick{
 		bool result = false;
 		if (FD_ISSET(fd_, &set_))
 		{
-			if (read(fd_, &event_, sizeof(js_event)) == -1 && errno != EAGAIN)
-				return false;  // joystick is probably closed
+			if (read(fd_, &event_, sizeof(js_event)) == -1 && errno == EAGAIN)
+				return false;
 
 			switch (event_.type)
 			{
@@ -215,7 +215,7 @@ namespace joystick{
 				}
 					break;
 				default:
-		            LogManager::get()->warning("[JOYSTICK] Unknown event type. Time: " + toString(event_.time) + " Value: " + toString(event_.value) + " Type: " + toString(event_.type) + " Number: " + toString(event_.number), useCout_);
+		            LogManager::get()->warning("[JOYSTICK] Unknown event type. Time: " + toString(event_.time) + " Value: " + toString(event_.value) + " Type: " + toString(event_.type) + " Number: " + toString(event_.number), useCout_.load());
 					break;
 			}
 		}
@@ -233,7 +233,7 @@ namespace joystick{
 		auto dev_dir = opendir(path);
 		if (dev_dir == nullptr)
 		{
-            LogManager::get()->error("[JOYSTICK] Couldn't open /dev/input", useCout_);
+            LogManager::get()->error("[JOYSTICK] Couldn't open /dev/input", useCout_.load());
 			return "";
 		}
 
@@ -263,7 +263,7 @@ namespace joystick{
 			close(joy_fd);
 			closedir(dev_dir);
 
-            LogManager::get()->status("[JOYSTICK] Found Joystick: " + toString(current_joy_name) + " in: " + current_path.c_str(), useCout_);
+            LogManager::get()->status("[JOYSTICK] Found Joystick: " + toString(current_joy_name) + " in: " + current_path.c_str(), useCout_.load());
 
 			return current_path;
 		}
@@ -286,7 +286,7 @@ namespace joystick{
 		auto dev_dir = opendir(path);
 		if (dev_dir == nullptr)
 		{
-            LogManager::get()->error("[JOYSTICK] Couldn't open /dev/input/by-id Error: " + toString(strerror(errno)), useCout_);
+            LogManager::get()->error("[JOYSTICK] Couldn't open /dev/input/by-id Error: " + toString(strerror(errno)), useCout_.load());
 			return "";
 		}
 
@@ -335,7 +335,7 @@ namespace joystick{
 			const auto current_path = std::string(path) + "/" + entry->d_name;
 			if (current_path.find(joy_dev_id_prefix) != std::string::npos)
 			{
-	            LogManager::get()->status("[JOYSTICK] Found force feedback event device:  " + current_path, useCout_);
+	            LogManager::get()->status("[JOYSTICK] Found force feedback event device:  " + current_path, useCout_.load());
 				event_dev = current_path;
 				break;
 			}
@@ -349,20 +349,20 @@ namespace joystick{
 	{
 		if (_joy.empty() || _ff.empty())
 		{
-			LogManager::get()->error("[JOYSTICK] Joy name or ff name is empty", useCout_);
+			LogManager::get()->error("[JOYSTICK] Joy name or ff name is empty", useCout_.load());
 			return false;
 		}
 
 		bool first_fault = true;
 		while (true)
 		{
-			fd_ = open(_joy.c_str(), O_RDONLY);
+			fd_ = open(_joy.c_str(), O_RDONLY | O_NONBLOCK);
 
 			if (fd_ != -1)
 			{	
 				// hack for initial state data
 				close(fd_);
-				fd_ = open(_joy.c_str(), O_RDONLY);
+				fd_ = open(_joy.c_str(), O_RDONLY | O_NONBLOCK);
 			}
 
 			if (fd_ != -1)
@@ -370,7 +370,7 @@ namespace joystick{
 
 			if (first_fault)
 			{
-				LogManager::get()->error("[JOYSTICK] Couldn't open joystick " + _joy + " Retry every second", useCout_);
+				LogManager::get()->error("[JOYSTICK] Couldn't open joystick " + _joy + " Retry every second", useCout_.load());
 				first_fault = false;
 			}
 			sleep(1.0);
@@ -389,7 +389,7 @@ namespace joystick{
 		ie.value = 0xFFFFUL * gain / 100;
 
 		if (write(ff_, &ie, sizeof(ie)) == -1)
-			LogManager::get()->warning("[JOYSTICK] Couldn't set gain on joystick force feedback, Error: " + toString(strerror(errno)), useCout_);
+			LogManager::get()->warning("[JOYSTICK] Couldn't set gain on joystick force feedback, Error: " + toString(strerror(errno)), useCout_.load());
 
 		memset(&joyEffect_, 0, sizeof(joyEffect_));
 		joyEffect_.id = -1;

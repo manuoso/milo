@@ -35,7 +35,7 @@ namespace driver{
     CommandSocket::CommandSocket(bool _useCout, std::string _ip, int _port) 
         : waiting_(false), respond_(false)
     {
-        useCout_ = _useCout;
+        useCout_.store(_useCout);
         remotEndpoint_ = boost::asio::ip::udp::endpoint(boost::asio::ip::address::from_string(_ip), _port);
         if (create(38065))
         {
@@ -46,7 +46,7 @@ namespace driver{
         }
         else
         {
-            LogManager::get()->error("[COMMAND_SOCKET] Socket not initialized", useCout_);
+            LogManager::get()->error("[COMMAND_SOCKET] Socket not initialized", useCout_.load());
         }
     }
 
@@ -74,7 +74,7 @@ namespace driver{
 
         if (waiting_) 
         {
-            LogManager::get()->error("[COMMAND_SOCKET] Error TIMEOUT", useCout_);
+            LogManager::get()->error("[COMMAND_SOCKET] Error TIMEOUT", useCout_.load());
             waiting_ = false;
         }
     }

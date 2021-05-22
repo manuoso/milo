@@ -34,16 +34,16 @@ namespace telemetry{
     TelloTelemetry::TelloTelemetry(bool _useCout, int _port)
         : run_(false)
     {
-        useCout_ = _useCout;
-        stateSocket_ = new driver::StateSocket(useCout_, _port);
+        useCout_.store(_useCout);
+        stateSocket_ = new driver::StateSocket(useCout_.load(), _port);
         if (stateSocket_ != nullptr)
         {
-            LogManager::get()->status("[TELLO_TELEMETRY] Init State Socket", useCout_);
+            LogManager::get()->status("[TELLO_TELEMETRY] Init State Socket", useCout_.load());
             decodeThread();
         }
         else
         {
-            LogManager::get()->error("[TELLO_TELEMETRY] Not initialize State Socket", useCout_);
+            LogManager::get()->error("[TELLO_TELEMETRY] Not initialize State Socket", useCout_.load());
         }
     }
 

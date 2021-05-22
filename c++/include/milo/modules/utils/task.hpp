@@ -20,55 +20,56 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-// Those class are based in: https://github.com/clydemcqueen/tello_ros/blob/master/tello_driver/
-
 #pragma once
 
-#ifdef HAS_BOOST
-
-#include "milo/modules/socket/TelloSocket.hpp"
+#include <atomic>
+#include <mutex>
+#include <thread>
+#include <unistd.h>
+#include <chrono>
+#include <memory>
 
 namespace milo{
 namespace modules{
-namespace command{
-namespace driver{
+namespace utils{
 
-    class CommandSocket : public socket::TelloSocket
-    {
+    class Task {
         public:
-            CommandSocket(bool _useCout, std::string _ip, int _port);
+            Task(unsigned int _duration);
 
-            virtual ~CommandSocket();
+            void setDuration(unsigned int _duration);
 
-            bool isInit();
-            
-            void timeout() override;
+            virtual ~Task();
 
-            bool waiting();
+            virtual void run();
 
-            bool respond();
+            virtual void stop();
 
-            std::chrono::high_resolution_clock::time_point receive_time();
-
-            std::chrono::high_resolution_clock::time_point send_time();
-
-            void send(std::string _cmd);
+            virtual void step() = 0;
 
         private:
-            void process_packet(size_t r) override;
 
+            class Runnable
+            {
+            public:
+                Runnable(Task* _task);
+                virtual ~Runnable();
+                void run();
+
+            private:
+                Task* task_;
+            };
+        
         private:
-            boost::asio::ip::udp::endpoint remotEndpoint_;
+            std::atomic<bool> run_;
 
-            std::chrono::high_resolution_clock::time_point sendTime_;  
-            std::atomic<bool> waiting_;    
-            std::atomic<bool> respond_;
+            std::chrono::microseconds duration_;
 
-    };
+            std::mutex lock_;
+            std::shared_ptr<std::thread> thread_;
+            std::shared_ptr<Runnable> taskRunner_;
+        };
 
 }
 }
 }
-}
-
-#endif

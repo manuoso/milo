@@ -20,8 +20,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 
-#ifndef __MILO_MODULES_LOG_MANAGER_H__
-#define __MILO_MODULES_LOG_MANAGER_H__ 1
+#pragma once
 
 #include <fstream>
 #include <iostream>
@@ -67,5 +66,3 @@ namespace logger{
 }
 }
 }
-
-#endif

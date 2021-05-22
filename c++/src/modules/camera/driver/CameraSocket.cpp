@@ -45,7 +45,7 @@ namespace driver{
     CameraSocket::CameraSocket(bool _useCout, int _port) 
         : seq_buffer_next_(0), seq_buffer_num_packets_(0)
     {
-        useCout_ = _useCout;
+        useCout_.store(_useCout);
         if (create(_port))
         {
             buffer_ = std::vector<unsigned char>(2048);
@@ -54,7 +54,7 @@ namespace driver{
         }
         else
         {
-            LogManager::get()->error("[CAMERA_SOCKET] Socket not initialized", useCout_);
+            LogManager::get()->error("[CAMERA_SOCKET] Socket not initialized", useCout_.load());
         }
     }
 

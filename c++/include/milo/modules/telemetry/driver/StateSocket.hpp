@@ -22,8 +22,7 @@
 
 // Those class are based in: https://github.com/clydemcqueen/tello_ros/blob/master/tello_driver/
 
-#ifndef __MILO_MODULES_TELEMETRY_DRIVER_H__
-#define __MILO_MODULES_TELEMETRY_DRIVER_H__ 1
+#pragma once
 
 #ifdef HAS_BOOST
 
@@ -57,7 +56,5 @@ namespace driver{
 }
 }
 }
-
-#endif
 
 #endif
